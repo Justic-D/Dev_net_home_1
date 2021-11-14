@@ -41,8 +41,8 @@
    commit 8364383c359a6b738a436d1b7745ccdce178df47 Push plugin discovery down into command package  
   
 
-7. $ git log -S synchronizedWriters --oneline
-   $ git show 5ac311e2a
+7. $ git log -S synchronizedWriters --oneline  
+   $ git show 5ac311e2a  
    Author: Martin Atkins <mart@degeneration.co.uk>  
 
 ## ДЗ 2.3
