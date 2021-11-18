@@ -1,8 +1,8 @@
 # Репозиторий для домашних заданий по курсу DevOps
 ## ДЗ 3.1
 #### Работа в терминале, лекция 1
-1. `sudo apt install virtualbox`
-2. `sudo apt install vagrant`
+1. VirtualBox установлен
+2. Vagrant установлен
 3. Git Bash
 4. Выполнено
 5. RAM: 1024 mb  
