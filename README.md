@@ -1,4 +1,69 @@
 # Репозиторий для домашних заданий по курсу DevOps
+## ДЗ 3.3
+#### Операционные системы, лекция 1
+1. Системный вызов CD `chdir("/tmp")`  
+2. База данных `file` находится здесь `/usr/share/misc/magic.mgc`  
+Пытается искать еще и здесь:  
+```buildoutcfg
+newfstatat(AT_FDCWD, "/home/wiktormyszolow/.magic.mgc", 0x7fff3633b110, 0) = -1 ENOENT (Нет такого файла или каталога)
+newfstatat(AT_FDCWD, "/home/wiktormyszolow/.magic", 0x7fff3633b110, 0) = -1 ENOENT (Нет такого файла или каталога)
+openat(AT_FDCWD, "/etc/magic.mgc", O_RDONLY) = -1 ENOENT (Нет такого файла или каталога)
+newfstatat(AT_FDCWD, "/etc/magic", {st_mode=S_IFREG|0644, st_size=111, ...}, 0) = 0
+openat(AT_FDCWD, "/etc/magic", O_RDONLY) = 3
+```
+3. Используем lsof чтобы найти удаленный, но открытый файл, все еще занимающий место:  
+```buildoutcfg
+# lsof | grep deleted | grep 703bebcf.log
+gnome-she 1027                 wiktormyszolow   50r      REG               0,38    32768        955 /home/wiktormyszolow/share/metadata/703bebcf.log (deleted)
+```
+Найдем запись, `/proc/<pid>/fd/` которая соответствует дескриптору файла:  
+```buildoutcfg
+$ ls -l /proc/1027/fd/703bebcf.log
+lrwx------. 1 wiktormyszolow wiktormyszolow 64 дек  5 01:13 77 -> /home/wiktormyszolow/share/metadata/703bebcf.log (deleted)
+```
+Далее `cat /dev/null` в FD:  
+`$ cat /dev/null > /proc/1027/fd/77`
+
+Процесс еще открыт, но теперь имеет длину 0:  
+```buildoutcfg
+gnome-she 1027                 wiktormyszolow   50r      REG               0,38    0        955 /home/wiktormyszolow/share/metadata/703bebcf.log (deleted)
+```
+4. Процессы "Зомби", в отличие от "сирот", освобождают свои ресурсы, но не освобождают запись в таблице процессов. Запись освободиться при вызове wait() родительским процессом.
+5. `# /usr/sbin/opensnoop-bpfcc`  
+```buildoutcfg
+PID    COMM               FD ERR PATH
+870    vminfo              4   0 /var/run/utmp
+559    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
+559    dbus-daemon        26   0 /usr/share/dbus-1/system-services
+559    dbus-daemon        -1   2 /lib/dbus-1/system-services
+559    dbus-daemon        26   0 /var/lib/snapd/dbus-1/system-services/
+```
+6. Системный вызов `uname()`.  
+`$ man 2 uname`:
+> Часть информации из структуры utsname может быть получена также через /proc/sys/kernel/ {ostype, hostname, osrelease, version, domainname}.  
+7. `&&` - условный оператор,   
+а `;`  - разделитель последовательных команд.  
+`test -d /tmp/some_dir; echo Hi` - `echo` отработает в любом случае.  
+`test -d /tmp/some_dir && echo Hi` - `echo` отработает только при успешном завершении команды test.  
+`set -e` - прерывает сессию при любом ненулевом значении исполняемых команд в конвейере кроме последней.  
+Использование `&&` вместе с `set -e` вероятно не имеет смысла, так как при ошибке выполнение команды прекратиться.
+8. `-e` - прерывает выполнение исполнения при ошибке любой команды кроме последней в последовательности.   
+`-x` - вывод трейса простых команд.   
+`-u` - неустановленные/не заданные параметры и переменные считаются как ошибки, с выводом в stderr текста ошибки и выполнит завершение неинтерактивного вызова.  
+`-o` - pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.  
+В сценариях повышает детализациею вывода ошибок (логирования), и завершит сценарий при наличии ошибок, на любом этапе выполнения сценария, кроме последней завершающей команды.
+9. `$ ps -A -o s | sort -k2 | uniq -c | sort -n`
+```buildoutcfg
+      1 R
+      4 T
+     42 I
+     94 S
+```
+Наиболее часто встречающиеся статусы:  
+     `I` - Фоновые (бездействующие) процессы ядра (42 процесса).  
+     `S` - Процессы ожидающие завершения (94 процесса).  
+  
+Дополнительные буквы означают дополнительные характеристики - например приоритет.
 ## ДЗ 3.2
 #### Работа в терминале, лекция 2
 1. Команда cd - это команда изменения рабочего каталога, встроенная в shell.  
