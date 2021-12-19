@@ -1,17 +1,23 @@
 # Репозиторий для домашних заданий по курсу DevOps
 ## ДЗ 3.4
 #### Операционные системы, лекция 2
-1. Node_exporter установлен, порт  9100 проброшен:  
-     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_1.jpg)
-   - Node_exporter помещен в автозагрузку:  
-     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_3.jpg)
-   - Предусмотрена возможность добавления опций:  
-     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_2.jpg)
-   - Сервис стартует и запускается корректно:  
-     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_4.jpg)
-   - При перезапуске переменная окружения выставляется:  
-     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_5.jpg)  
-2. Ответ:
+1. *Используя знания из лекции по systemd, создайте самостоятельно простой unit-файл для node_exporter:*  
+    - *поместите его в автозагрузку,*  
+    - *предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на systemctl cat cron),*  
+    - 8удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.*  
+####Ответ:  
+    - Node_exporter установлен, порт  9100 проброшен:  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_1.jpg)
+    - Node_exporter помещен в автозагрузку:  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_3.jpg)
+    - Предусмотрена возможность добавления опций:  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_2.jpg)
+    - Сервис стартует и запускается корректно:  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_4.jpg)
+    - При перезапуске переменная окружения выставляется:  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_5.jpg)  
+2. *Ознакомьтесь с опциями node_exporter и выводом /metrics по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.*  
+####Ответ:  
 ```
 CPU:
 node_cpu_seconds_total{cpu="0",mode="idle"} 1046.19
@@ -35,16 +41,27 @@ node_network_receive_bytes_total{device="eth0"} 189159
 node_network_transmit_bytes_total{device="eth0"} 201603
 node_network_transmit_errs_total{device="eth0"} 0
 ```
-3. Netdata установлена:  
+3. *Установите в свою виртуальную машину Netdata. Воспользуйтесь готовыми пакетами для установки (sudo apt install -y netdata). После успешной установки:*  
+- *в конфигурационном файле /etc/netdata/netdata.conf в секции [web] замените значение с localhost на bind to = 0.0.0.0,*  
+- *добавьте в Vagrantfile проброс порта Netdata на свой локальный компьютер и сделайте vagrant reload:*
+
+`config.vm.network "forwarded_port", guest: 19999, host: 19999`
+- *После успешной перезагрузки в браузере на своем ПК (не в виртуальной машине) вы должны суметь зайти на localhost:19999. Ознакомьтесь с метриками, которые по умолчанию собираются Netdata и с комментариями, которые даны к этим метрикам.*  
+####Ответ:  
+- Netdata установлена:  
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_6.jpg)  
-4. По выводу dmesg видим что - да, а так же тип ВМ, так как есть соответсвующая строка:  
+4. *Можно ли по выводу dmesg понять, осознает ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?*  
+####Ответ: 
+По выводу dmesg видим что - да, а так же тип ВМ, так как есть соответсвующая строка:  
 ```
 vagrant@vagrant:~$ dmesg |grep virtualiz
 [    0.004879] CPU MTRRs all blank - virtualized system.
 [    0.221288] Booting paravirtualized kernel on KVM
 [    4.883013] systemd[1]: Detected virtualization oracle.
 ```
-5. `sysctl` настроен по умолчанию так:
+5. *Как настроен sysctl fs.nr_open на системе по-умолчанию? Узнайте, что означает этот параметр. Какой другой существующий лимит не позволит достичь такого числа (ulimit --help)?*  
+####Ответ: 
+`sysctl` настроен по умолчанию так:
 ```
 vagrant@vagrant:~$ /sbin/sysctl -n fs.nr_open
 1048576
@@ -67,10 +84,13 @@ vagrant@vagrant:~$ ulimit -Hn
 1048576
 ```
 Оба эти лимита не могут превысить `fs.nr_open`.  
-6. Ответ:  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_7.jpg)  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_8.jpg)  
-7. Это так называемая Fork-бомба. Команда определяет функцию под названием `:` ( :() ). 
+6. *Запустите любой долгоживущий процесс (не ls, который отработает мгновенно, а, например, sleep 1h) в отдельном неймспейсе процессов; покажите, что ваш процесс работает под PID 1 через nsenter. Для простоты работайте в данном задании под root (sudo -i). Под обычным пользователем требуются дополнительные опции (--map-root-user) и т.д.*  
+####Ответ:  
+   ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_7.jpg)
+   ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_8.jpg)  
+7. *Найдите информацию о том, что такое :(){ :|:& };:. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (это важно, поведение в других ОС не проверялось). Н екоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов dmesg расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?*  
+####Ответ:  
+Это так называемая Fork-бомба. Команда определяет функцию под названием `:` ( :() ). 
 Внутри функции ( {...} ) есть `:|:&`, которая выглядит следующим образом:  
     - `:` снова вызывает эту функцию `:`.  
     - `|` означает передачу выходных данных в команду.  
