@@ -67,7 +67,7 @@ vagrant@vagrant:~$ ulimit -Hn
 1048576
 ```
 Оба эти лимита не могут превысить `fs.nr_open`.  
-6. Ответ:
+6. Ответ:  
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_7.jpg)  
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_8.jpg)  
 7. Это так называемая Fork-бомба. Команда определяет функцию под названием `:` ( :() ). 
