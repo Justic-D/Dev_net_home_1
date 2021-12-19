@@ -1,10 +1,134 @@
 # Репозиторий для домашних заданий по курсу DevOps
+## ДЗ 3.4
+#### Операционные системы, лекция 2
+1. Node_exporter установлен, порт  9100 проброшен:
+     ![](https://github.com/WiktorMysz/devops-netology/img/3.4_1.jpg)
+   - Node_exporter помещен в автозагрузку:
+     ![](https://github.com/WiktorMysz/devops-netology/img/3.4_3.jpg)
+   - Предусмотрена возможность добавления опций:
+     ![](https://github.com/WiktorMysz/devops-netology/img/3.4_2.jpg)
+   - Сервис стартует и запускается корректно:
+     ![](https://github.com/WiktorMysz/devops-netology/img/3.4_4.jpg)
+   - При перезапуске переменная окружения выставляется:
+     ![](https://github.com/WiktorMysz/devops-netology/img/3.4_5.jpg)
+2. Ответ:
+```
+CPU:
+node_cpu_seconds_total{cpu="0",mode="idle"} 1046.19
+node_cpu_seconds_total{cpu="0",mode="system"} 14.38
+node_cpu_seconds_total{cpu="0",mode="user"} 17.06
+process_cpu_seconds_total 0.24
+
+Memory:
+node_memory_MemAvailable_bytes 5.59202304e+08
+node_memory_MemFree_bytes 7.5513856e+07
+
+Disk:
+node_disk_io_time_seconds_total{device="sda"} 51.42
+node_disk_read_bytes_total{device="sda"} 6.76783104e+08
+node_disk_read_time_seconds_total{device="sda"} 94.678
+node_disk_write_time_seconds_total{device="sda"} 5.863
+
+Network:
+node_network_receive_bytes_total{device="eth0"} 170971
+node_network_receive_bytes_total{device="eth0"} 189159
+node_network_transmit_bytes_total{device="eth0"} 201603
+node_network_transmit_errs_total{device="eth0"} 0
+```
+3. Netdata установлена:
+      ![](https://github.com/WiktorMysz/devops-netology/img/3.4_6.jpg)
+4. По выводу dmesg видим что - да, а так же тип ВМ, так как есть соответсвующая строка:  
+```
+vagrant@vagrant:~$ dmesg |grep virtualiz
+[    0.004879] CPU MTRRs all blank - virtualized system.
+[    0.221288] Booting paravirtualized kernel on KVM
+[    4.883013] systemd[1]: Detected virtualization oracle.
+```
+5. `sysctl` настроен по умолчанию так:
+```
+vagrant@vagrant:~$ /sbin/sysctl -n fs.nr_open
+1048576
+```
+Это максимальное число открытых дескрипторов для ядра (системы), для пользователя задать больше этого числа нельзя. 
+Число задается кратное 1024, в данном случае =1024*1024.  
+Но максимальный предел ОС можно посмотреть так:
+```
+vagrant@vagrant:~$ cat /proc/sys/fs/file-max
+9223372036854775807
+```
+Мягкий лимит (так же ulimit -n) на пользователя (может быть увеличен в процессе работы):
+```
+vagrant@vagrant:~$ ulimit -Sn
+1024
+```
+Жесткий лимит на пользователя (не может быть увеличен, только уменьшен).
+```
+vagrant@vagrant:~$ ulimit -Hn
+1048576
+```
+Оба эти лимита не могут превысить `fs.nr_open`.
+6. Ответ:
+      ![](https://github.com/WiktorMysz/devops-netology/img/3.4_7.jpg)
+      ![](https://github.com/WiktorMysz/devops-netology/img/3.4_8.jpg)
+7. Это так называемая Fork-бомба. Команда определяет функцию под названием `:` ( :() ). 
+Внутри функции ( {...} ) есть `:|:&`, которая выглядит следующим образом:  
+    - `:` снова вызывает эту функцию `:`.  
+    - `|` означает передачу выходных данных в команду.
+    - `:` после `|` означает трубу к функции `:`.  
+    - `&`, в данном случае, означает выполнение предыдущего в фоновом режиме.  
+     
+   Затем есть `;`, который известен как разделитель команд.  
+   Наконец, `:` запускает эту "цепную реакцию". Таким образом, каждый экземпляр `:` начинает два новых `:` и так далее...  
+   Это приводит к тому, что компьютеру не хватает памяти из-за бесконечного разветвления процесса.  
+
+С разрывами строк понятнее:
+```
+:()
+{
+    :|:&
+};
+:
+```
+Механизм судя по всему этот:  
+```
+[ 3947.162817] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-6.scope
+```
+`Systemd` создает группу для каждого пользователя, и все процессы пользователя принадлежат одной и той же группе.  
+
+`Cgroups` - это механизм Linux, устанавливающий ограничения на системные ресурсы, такие как максимальное количество процессов, циклы ЦП, использование ОЗУ и т. Д. Это другой, более современный уровень ограничения ресурсов, чем ulimit (который использует getrlimit() системный вызов).  
+
+Если запустить `systemctl status user-<uid>.slice` (где <uid> - cgroup пользователя), увидим текущее и максимальное количество задач (процессов и потоков), которые разрешены в этой cgroup.  
+```
+root@vagrant:~# systemctl status user-1000.slice
+● user-1000.slice - User Slice of UID 1000
+     Loaded: loaded
+    Drop-In: /usr/lib/systemd/system/user-.slice.d
+             └─10-defaults.conf
+     Active: active since Sun 2021-12-19 01:47:55 UTC; 2h 13min ago
+       Docs: man:user@.service(5)
+      Tasks: 37 (limit: 2357)
+     Memory: 38.9M
+```
+По умолчанию максимальное количество задач, которое systemd разрешает для каждого пользователя, составляет 33% от «общесистемного максимума» (sysctl kernel.threads-max); обычно это составляет около 10000 задач. Если необходимо изменить это ограничение:  
+
+В systemd v239 и более поздних версиях пользователь по умолчанию устанавливается через `TasksMax = in`:
+```
+    /usr/lib/systemd/system/user-.slice.d/10-defaults.conf
+```
+Чтобы настроить ограничение для конкретного пользователя (которое будет применено сразу же, а также сохранено в /etc/systemd/system.control), выполните:
+```
+    systemctl [--runtime] set-property user-<uid>.slice TasksMax=<value>
+```
+Также можно использовать механизмы переопределения настроек устройства (например, systemctl edit), но они потребуют перезагрузки.  
+Если вы хотите изменить ограничение для каждого пользователя, вы можете создать `/etc/systemd/system/user-.slice.d/15-limits.conf`.
+
+
 ## ДЗ 3.3
 #### Операционные системы, лекция 1
 1. Системный вызов CD `chdir("/tmp")`  
 2. База данных `file` находится здесь `/usr/share/misc/magic.mgc`  
 Пытается искать еще и здесь:  
-```buildoutcfg
+```
 newfstatat(AT_FDCWD, "/home/wiktormyszolow/.magic.mgc", 0x7fff3633b110, 0) = -1 ENOENT (Нет такого файла или каталога)
 newfstatat(AT_FDCWD, "/home/wiktormyszolow/.magic", 0x7fff3633b110, 0) = -1 ENOENT (Нет такого файла или каталога)
 openat(AT_FDCWD, "/etc/magic.mgc", O_RDONLY) = -1 ENOENT (Нет такого файла или каталога)
@@ -12,12 +136,12 @@ newfstatat(AT_FDCWD, "/etc/magic", {st_mode=S_IFREG|0644, st_size=111, ...}, 0) 
 openat(AT_FDCWD, "/etc/magic", O_RDONLY) = 3
 ```
 3. Используем lsof чтобы найти удаленный, но открытый файл, все еще занимающий место:  
-```buildoutcfg
+```
 # lsof | grep deleted | grep 703bebcf.log
 gnome-she 1027                 wiktormyszolow   50r      REG               0,38    32768        955 /home/wiktormyszolow/share/metadata/703bebcf.log (deleted)
 ```
 Найдем запись, `/proc/<pid>/fd/` которая соответствует дескриптору файла:  
-```buildoutcfg
+```
 $ ls -l /proc/1027/fd/703bebcf.log
 lrwx------. 1 wiktormyszolow wiktormyszolow 64 дек  5 01:13 77 -> /home/wiktormyszolow/share/metadata/703bebcf.log (deleted)
 ```
@@ -25,12 +149,12 @@ lrwx------. 1 wiktormyszolow wiktormyszolow 64 дек  5 01:13 77 -> /home/wikto
 `$ cat /dev/null > /proc/1027/fd/77`
 
 Процесс еще открыт, но теперь имеет длину 0:  
-```buildoutcfg
+```
 gnome-she 1027                 wiktormyszolow   50r      REG               0,38    0        955 /home/wiktormyszolow/share/metadata/703bebcf.log (deleted)
 ```
 4. Процессы "Зомби", в отличие от "сирот", освобождают свои ресурсы, но не освобождают запись в таблице процессов. Запись освободиться при вызове wait() родительским процессом.
 5. `# /usr/sbin/opensnoop-bpfcc`  
-```buildoutcfg
+```
 PID    COMM               FD ERR PATH
 870    vminfo              4   0 /var/run/utmp
 559    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
@@ -53,7 +177,7 @@ PID    COMM               FD ERR PATH
 `-o` - pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.  
 В сценариях повышает детализациею вывода ошибок (логирования), и завершит сценарий при наличии ошибок, на любом этапе выполнения сценария, кроме последней завершающей команды.
 9. `$ ps -A -o s | sort -k2 | uniq -c | sort -n`
-```buildoutcfg
+```
       1 R
       4 T
      42 I
