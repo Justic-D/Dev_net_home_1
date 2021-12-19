@@ -12,7 +12,7 @@
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_3.jpg)
     - Предусмотрена возможность добавления опций:  
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_2.jpg)
-    - Сервис стартует и запускается корректно:  
+    - Сервис стартует и завершается корректно:  
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_4.jpg)
     - При перезапуске переменная окружения выставляется:  
       ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_5.jpg)  
