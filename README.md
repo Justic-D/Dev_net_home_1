@@ -1,16 +1,16 @@
 # Репозиторий для домашних заданий по курсу DevOps
 ## ДЗ 3.4
 #### Операционные системы, лекция 2
-1. Node_exporter установлен, порт  9100 проброшен:
+1. Node_exporter установлен, порт  9100 проброшен:  
      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_1.jpg)
-   - Node_exporter помещен в автозагрузку:
+   - Node_exporter помещен в автозагрузку:  
      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_3.jpg)
-   - Предусмотрена возможность добавления опций:
+   - Предусмотрена возможность добавления опций:  
      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_2.jpg)
-   - Сервис стартует и запускается корректно:
+   - Сервис стартует и запускается корректно:  
      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_4.jpg)
-   - При перезапуске переменная окружения выставляется:
-     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_5.jpg)
+   - При перезапуске переменная окружения выставляется:  
+     ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_5.jpg)  
 2. Ответ:
 ```
 CPU:
@@ -35,8 +35,8 @@ node_network_receive_bytes_total{device="eth0"} 189159
 node_network_transmit_bytes_total{device="eth0"} 201603
 node_network_transmit_errs_total{device="eth0"} 0
 ```
-3. Netdata установлена:
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_6.jpg)
+3. Netdata установлена:  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_6.jpg)  
 4. По выводу dmesg видим что - да, а так же тип ВМ, так как есть соответсвующая строка:  
 ```
 vagrant@vagrant:~$ dmesg |grep virtualiz
@@ -66,10 +66,10 @@ vagrant@vagrant:~$ ulimit -Sn
 vagrant@vagrant:~$ ulimit -Hn
 1048576
 ```
-Оба эти лимита не могут превысить `fs.nr_open`.
+Оба эти лимита не могут превысить `fs.nr_open`.  
 6. Ответ:
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_7.jpg)
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_8.jpg)
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_7.jpg)  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.4_8.jpg)  
 7. Это так называемая Fork-бомба. Команда определяет функцию под названием `:` ( :() ). 
 Внутри функции ( {...} ) есть `:|:&`, которая выглядит следующим образом:  
     - `:` снова вызывает эту функцию `:`.  
