@@ -40,6 +40,7 @@ X-DNS-Prefetch-Control: off
 Set-Cookie: prov=403d03ab-7551-9d0e-8a59-9796a147863f; domain=.stackoverflow.com; expires=Fri, 01-Jan-2055 00:00:00 GMT; path=/; HttpOnly
 ```
 Мы получили ответ http сервера сайта `stackoverflow.com`. Ответ `301 Moved Permanently` в заголовке означает что сайт был окончательно перемещен. Т.е. редирект с http на https протокол того же url.  
+  
 2. *Повторите задание 1 в браузере, используя консоль разработчика F12.*  
 - *откройте вкладку Network*  
 - *отправьте запрос `http://stackoverflow.com`*  
