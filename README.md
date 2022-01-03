@@ -1,4 +1,179 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 3.6
+## ДЗ 3.6
+#### Компьютерные сети, лекция 1
+1. *Работа c HTTP через телнет.*  
+   - *Подключитесь утилитой телнет к сайту stackoverflow.com `telnet stackoverflow.com 80`*  
+   - *отправьте HTTP запрос*  
+```
+GET /questions HTTP/1.0
+HOST: stackoverflow.com
+[press enter]
+[press enter]
+```
+   - *В ответе укажите полученный HTTP код, что он означает?*  
+**Ответ:**  
+```
+vagrant@vagrant:~$ telnet stackoverflow.com 80
+Trying 151.101.193.69...
+Connected to stackoverflow.com.
+Escape character is '^]'.
+GET /questions HTTP/1.0
+HOST: stackoverflow.com
+
+HTTP/1.1 301 Moved Permanently
+cache-control: no-cache, no-store, must-revalidate
+location: https://stackoverflow.com/questions
+x-request-guid: 6f4a0a01-f11e-4660-8823-43c72afeb69c
+feature-policy: microphone 'none'; speaker 'none'
+content-security-policy: upgrade-insecure-requests; frame-ancestors 'self' https://stackexchange.com
+Accept-Ranges: bytes
+Date: Mon, 03 Jan 2022 01:33:31 GMT
+Via: 1.1 varnish
+Connection: close
+X-Served-By: cache-bma1682-BMA
+X-Cache: MISS
+X-Cache-Hits: 0
+X-Timer: S1641173611.913769,VS0,VE106
+Vary: Fastly-SSL
+X-DNS-Prefetch-Control: off
+Set-Cookie: prov=403d03ab-7551-9d0e-8a59-9796a147863f; domain=.stackoverflow.com; expires=Fri, 01-Jan-2055 00:00:00 GMT; path=/; HttpOnly
+```
+Мы получили ответ http сервера сайта `stackoverflow.com`. Ответ `301 Moved Permanently` в заголовке означает что сайт был окончательно перемещен. Т.е. редирект с http на https протокол того же url.
+2. *Повторите задание 1 в браузере, используя консоль разработчика F12.*  
+- *откройте вкладку Network*  
+- *отправьте запрос `http://stackoverflow.com`*  
+- *найдите первый ответ HTTP сервера, откройте вкладку `Headers`*  
+- *укажите в ответе полученный HTTP код.*  
+- *проверьте время загрузки страницы, какой запрос обрабатывался дольше всего?*  
+- *приложите скриншот консоли браузера в ответ.*  
+**Ответ:**  
+```
+HTTP/2 200 OK
+cache-control: private
+content-type: text/html; charset=utf-8
+content-encoding: gzip
+strict-transport-security: max-age=15552000
+x-frame-options: SAMEORIGIN
+x-request-guid: 0a9eec06-8db1-427a-96fc-b944e5f8c890
+feature-policy: microphone 'none'; speaker 'none'
+content-security-policy: upgrade-insecure-requests; frame-ancestors 'self' https://stackexchange.com
+accept-ranges: bytes
+date: Mon, 03 Jan 2022 02:53:07 GMT
+via: 1.1 varnish
+x-served-by: cache-bma1671-BMA
+x-cache: MISS
+x-cache-hits: 0
+x-timer: S1641178387.103850,VS0,VE144
+vary: Accept-Encoding,Fastly-SSL
+x-dns-prefetch-control: off
+X-Firefox-Spdy: h2
+```
+  
+- В ответ получили код 200 OK  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.6_1.jpg)  
+- Дольше всего обрабатывался запрос - начальная загрузка страницы 170 мс  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.6_2.jpg)  
+3. *Какой IP адрес у вас в интернете?*  
+```
+$ wget -O - -q icanhazip.com
+31.185.7.234
+```
+4. *Какому провайдеру принадлежит ваш IP адрес? Какой автономной системе AS? Воспользуйтесь утилитой `whois`*  
+**Ответ:**  
+```
+$ whois 31.185.7.234 | grep ^descr
+descr:          NFS TELECOM
+descr:          VIDNOE.NET
+```
+- IP адрес принадлежит NFS TELECOM
+```
+$ whois 31.185.7.234 | grep ^origin
+origin:         AS48573
+```
+- AS - AS48573  
+
+5. *Через какие сети проходит пакет, отправленный с вашего компьютера на адрес 8.8.8.8? Через какие AS? Воспользуйтесь утилитой `traceroute`*  
+**Ответ:**  
+```
+$ traceroute -AnI 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+ 1  10.0.2.2 [*]  0.305 ms  0.270 ms  0.255 ms
+ 2  172.16.0.1 [*]  4.283 ms  4.736 ms  5.261 ms
+ 3  172.68.9.1 [AS13335]  5.947 ms  6.218 ms  6.147 ms
+ 4  172.68.8.5 [AS13335]  7.296 ms  8.442 ms  8.841 ms
+ 5  108.170.250.129 [AS15169]  9.762 ms  9.750 ms  9.689 ms
+ 6  108.170.250.146 [AS15169]  9.668 ms  7.012 ms  7.404 ms
+ 7  * 142.250.239.64 [AS15169]  28.050 ms *
+ 8  74.125.253.109 [AS15169]  27.990 ms  29.031 ms  29.007 ms
+ 9  142.250.209.25 [AS15169]  29.233 ms  32.611 ms  30.227 ms
+10  * * *
+11  * * *
+12  * * *
+13  * * *
+14  * * *
+15  * * *
+16  * * *
+17  * * *
+18  * * *
+19  * * *
+20  * 8.8.8.8 [AS15169]  28.679 ms *
+```  
+- Пакет проходит через AS - AS13335, AS15169.
+```
+$ grep OrgName <(whois AS13335)
+OrgName:        Cloudflare, Inc.
+$ grep OrgName <(whois AS15169)
+OrgName:        Google LLC
+```
+6. *Повторите задание 5 в утилите `mtr`. На каком участке наибольшая задержка - delay?*  
+**Ответ:**  
+```
+vagrant@vagrant:~$ mtr 8.8.8.8 -znrc 1
+Start: 2022-01-03T03:54:37+0000
+HOST: vagrant                     Loss%   Snt   Last   Avg  Best  Wrst StDev
+  1. AS???    10.0.2.2             0.0%     1    0.4   0.4   0.4   0.4   0.0
+  2. AS???    172.16.0.1           0.0%     1    5.2   5.2   5.2   5.2   0.0
+  3. AS13335  172.68.9.1           0.0%     1    7.6   7.6   7.6   7.6   0.0
+  4. AS13335  172.68.8.5           0.0%     1    6.8   6.8   6.8   6.8   0.0
+  5. AS15169  108.170.250.129      0.0%     1    7.4   7.4   7.4   7.4   0.0
+  6. AS15169  108.170.250.146      0.0%     1    6.2   6.2   6.2   6.2   0.0
+  7. AS15169  142.250.239.64       0.0%     1   27.4  27.4  27.4  27.4   0.0
+  8. AS15169  74.125.253.109       0.0%     1   27.8  27.8  27.8  27.8   0.0
+  9. AS15169  142.250.209.25       0.0%     1   29.2  29.2  29.2  29.2   0.0
+ 10. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 11. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 12. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 13. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 14. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 15. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 16. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 17. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 18. AS15169  8.8.8.8              0.0%     1   29.0  29.0  29.0  29.0   0.0
+```  
+- Наибольшая задержка на 9 хопе.  
+7. *Какие DNS сервера отвечают за доменное имя dns.google? Какие A записи? воспользуйтесь утилитой `dig`*  
+**Ответ:**  
+```
+$ dig +short NS dns.google
+ns1.zdns.google.
+ns2.zdns.google.
+ns3.zdns.google.
+ns4.zdns.google.
+
+$ dig +short A dns.google
+8.8.8.8
+8.8.4.4
+```
+8. *Проверьте PTR записи для IP адресов из задания 7. Какое доменное имя привязано к IP? воспользуйтесь утилитой `dig`*  
+**Ответ:**  
+```
+$ for ip in `dig +short A dns.google`; do dig -x $ip | grep ^[0-9].*in-addr; done
+4.4.8.8.in-addr.arpa.   72628   IN      PTR     dns.google.
+8.8.8.8.in-addr.arpa.   72398   IN      PTR     dns.google.
+```
+
+
 ###### 3.5
 ## ДЗ 3.5
 #### Файловые системы
