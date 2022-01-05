@@ -1,4 +1,313 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 3.7
+## ДЗ 3.7
+#### Компьютерные сети, лекция 2
+1. *Проверьте список доступных сетевых интерфейсов на вашем компьютере. Какие команды есть для этого в Linux и в Windows?*  
+**Ответ:**  
+- ip link show (Linux)  
+```
+$ ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:73:60:cf brd ff:ff:ff:ff:ff:ff
+```  
+- ip a (Linux)  
+```
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:73:60:cf brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic eth0
+       valid_lft 84206sec preferred_lft 84206sec
+    inet6 fe80::a00:27ff:fe73:60cf/64 scope link
+       valid_lft forever preferred_lft forever
+```  
+- ipconfig /all (Windows)  
+```
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : Wiktor-PC
+   Primary Dns Suffix  . . . . . . . :
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+
+Ethernet adapter VirtualBox Host-Only Network:
+
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : VirtualBox Host-Only Ethernet Adapter
+   Physical Address. . . . . . . . . : 0A-00-27-00-00-11
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::25c7:3720:ea2e:b597%17(Preferred)
+   IPv4 Address. . . . . . . . . . . : 192.168.56.1(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+   DHCPv6 IAID . . . . . . . . . . . : 621412391
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-24-0A-D1-20-10-60-4B-7E-81-22
+   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Ethernet adapter Ethernet 3:
+
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Intel(R) 82578DM Gigabit Network Connection
+   Physical Address. . . . . . . . . : 18-A9-05-C1-FE-68
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv4 Address. . . . . . . . . . . : 192.168.88.254(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : wtorek, 4 stycznia 2022 11:08:33
+   Lease Expires . . . . . . . . . . : wtorek, 4 stycznia 2022 21:08:38
+   Default Gateway . . . . . . . . . : 192.168.88.1
+   DHCP Server . . . . . . . . . . . : 192.168.88.1
+   DNS Servers . . . . . . . . . . . : 192.168.88.1
+                                       192.168.0.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Ethernet adapter Сетевое подключение Bluetooth 2:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Bluetooth Device (Personal Area Network) #2
+   Physical Address. . . . . . . . . : 00-1A-7D-DA-71-10
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+```
+2. *Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?*  
+**Ответ:**  
+- Протокол LLDP.  
+- Пакет lldpd.  
+- Команда lldpctl.  
+3. *Какая технология используется для разделения L2 коммутатора на несколько виртуальных сетей? Какой пакет и команды есть в Linux для этого? Приведите пример конфига.*  
+**Ответ:**  
+- Технология называется VLAN (Virtual LAN).  
+- Пакет в Ubuntu Linux - vlan.  
+Пример конфига:
+- Добавляем vlan с тегом 200, затем выводим командой `ifconfig -a` список всех интерфейсов:  
+```
+$ sudo vconfig add eth0 200
+
+Warning: vconfig is deprecated and might be removed in the future, please migrate to ip(route2) as soon as possible!
+
+$ ifconfig -a
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+        inet6 fe80::a00:27ff:fe73:60cf  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:73:60:cf  txqueuelen 1000  (Ethernet)
+        RX packets 931  bytes 103280 (103.2 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 883  bytes 140624 (140.6 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth0.200: flags=4098<BROADCAST,MULTICAST>  mtu 1500
+        ether 08:00:27:73:60:cf  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 8  bytes 776 (776.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 8  bytes 776 (776.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+- Из вывода видно, что появился еще один логический интерфейс "eth0.200", который будет обрабатывать все пакеты, помеченные тегом 200 (принадлежащие сети VLAN200).  
+- Повесим ip-адрес на новый интерфейс "eth0.200":  
+```
+$ sudo ifconfig eth0.200 192.168.8.10 netmask 255.255.255.0 up
+$ ifconfig -a
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+        inet6 fe80::a00:27ff:fe73:60cf  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:73:60:cf  txqueuelen 1000  (Ethernet)
+        RX packets 1801  bytes 980240 (980.2 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 2423  bytes 416399 (416.3 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth0.200: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.8.10  netmask 255.255.255.0  broadcast 192.168.8.255
+        inet6 fe80::a00:27ff:fe73:60cf  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:73:60:cf  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 6  bytes 516 (516.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 12  bytes 1202 (1.2 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 12  bytes 1202 (1.2 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```  
+- Следует отметить, что после перезагрузки интерфейс "eth0.200" слетит.  
+4. *Какие типы агрегации интерфейсов есть в Linux? Какие опции есть для балансировки нагрузки? Приведите пример конфига.*  
+**Ответ:**  
+- В Linux есть две технологии агрегации (LAG): bonding и teaming.  
+
+Типы агрегации bonding:  
+
+```
+$ modinfo bonding | grep mode:
+parm:           mode:Mode of operation; 0 for balance-rr, 1 for active-backup, 2 for balance-xor, 3 for broadcast, 4 for 802.3ad, 5 for balance-tlb, 6 for balance-alb (charp)
+```
+
+- `active-backup` и `broadcast` обеспечивают только отказоустойчивость  
+- `balance-tlb`, `balance-alb`, `balance-rr`, `balance-xor` и `802.3ad` обеспечат отказоустойчивость и балансировку  
+
+- `balance-rr` - Политика round-robin. Пакеты отправляются последовательно, начиная с первого доступного интерфейса и заканчивая последним. Эта политика применяется для балансировки нагрузки и отказоустойчивости.  
+- `active-backup` - Политика активный-резервный. Только один сетевой интерфейс из объединённых будет активным. Другой интерфейс может стать активным, только в том случае, когда упадёт текущий активный интерфейс. Эта политика применяется для отказоустойчивости.  
+- `balance-xor` - Политика XOR. Передача распределяется между сетевыми картами используя формулу: `[( «MAC адрес источника» XOR «MAC адрес назначения») по модулю «число интерфейсов»]`. Получается одна и та же сетевая карта передаёт пакеты одним и тем же получателям. Политика XOR применяется для балансировки нагрузки и отказоустойчивости.  
+- `broadcast` - Широковещательная политика. Передает всё на все сетевые интерфейсы. Эта политика применяется для отказоустойчивости.  
+- `802.3ad` - Политика агрегирования каналов по стандарту IEEE 802.3ad. Создаются агрегированные группы сетевых карт с одинаковой скоростью и дуплексом. При таком объединении передача задействует все каналы в активной агрегации, согласно стандарту IEEE 802.3ad. Выбор через какой интерфейс отправлять пакет определяется политикой по умолчанию XOR политика.  
+- `balance-tlb` - Политика адаптивной балансировки нагрузки передачи. Исходящий трафик распределяется в зависимости от загруженности каждой сетевой карты (определяется скоростью загрузки). Не требует дополнительной настройки на коммутаторе. Входящий трафик приходит на текущую сетевую карту. Если она выходит из строя, то другая сетевая карта берёт себе MAC адрес вышедшей из строя карты.  
+- `balance-alb` - Политика адаптивной балансировки нагрузки. Включает в себя политику balance-tlb плюс осуществляет балансировку входящего трафика. Не требует дополнительной настройки на коммутаторе. Балансировка входящего трафика достигается путём ARP переговоров.  
+  
+Файлы конфигурации сети для Ubuntu 20.10 находятся по пути /etc/netplan/01-netcfg.yaml. Если нам нужна  
+отказоустойчивость `active-backup`, приводим его к виду:
+```
+ network:
+   version: 2
+   renderer: networkd
+   ethernets:
+     ens3:
+       dhcp4: no 
+       optional: true
+     ens5: 
+       dhcp4: no 
+       optional: true
+   bonds:
+     bond0: 
+       dhcp4: yes 
+       interfaces:
+         - ens3
+         - ens5
+       parameters:
+         mode: active-backup
+         primary: ens3
+         mii-monitor-interval: 2
+```
+Если нам нужна балансировка `balance-alb`, приводим его к виду:  
+```
+   bonds:
+     bond0: 
+       dhcp4: yes 
+       interfaces:
+         - ens3
+         - ens5
+       parameters:
+         mode: balance-alb
+         mii-monitor-interval: 2
+```  
+5. *Сколько IP адресов в сети с маской /29 ? Сколько /29 подсетей можно получить из сети с маской /24. Приведите несколько примеров /29 подсетей внутри сети 10.10.10.0/24.*  
+**Ответ:**  
+```
+$ ipcalc -b 10.10.10.0/24
+Address:   10.10.10.0           
+Netmask:   255.255.255.0 = 24
+Wildcard:  0.0.0.255
+=>
+Network:   10.10.10.0/24
+HostMin:   10.10.10.1
+HostMax:   10.10.10.254
+Broadcast: 10.10.10.255
+Hosts/Net: 254                   Class A, Private Internet
+
+$ ipcalc -b 10.10.10.0/29
+Address:   10.10.10.0           
+Netmask:   255.255.255.248 = 29
+Wildcard:  0.0.0.7
+=>
+Network:   10.10.10.0/29
+HostMin:   10.10.10.1
+HostMax:   10.10.10.6
+Broadcast: 10.10.10.7
+Hosts/Net: 6                     Class A, Private Internet
+
+$ ipcalc -b 10.10.10.8/29
+Address:   10.10.10.8           
+Netmask:   255.255.255.248 = 29
+Wildcard:  0.0.0.7
+=>
+Network:   10.10.10.8/29
+HostMin:   10.10.10.9
+HostMax:   10.10.10.14
+Broadcast: 10.10.10.15
+Hosts/Net: 6                     Class A, Private Internet
+
+$ ipcalc -b 10.10.10.16/29
+Address:   10.10.10.16          
+Netmask:   255.255.255.248 = 29
+Wildcard:  0.0.0.7
+=>
+Network:   10.10.10.16/29
+HostMin:   10.10.10.17
+HostMax:   10.10.10.22
+Broadcast: 10.10.10.23
+Hosts/Net: 6                     Class A, Private Internet
+
+* И так далее...
+```  
+- 8 адресов = 6 для хостов, 1 адрес сети и 1 широковещательный адрес.  
+- Сеть с маской /24 можно разбить на 32 подсети с маской /29  
+6. *Задача: вас попросили организовать стык между 2-мя организациями. Диапазоны 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 уже заняты. Из какой подсети допустимо взять частные IP адреса? Маску выберите из расчета максимум 40-50 хостов внутри подсети.*  
+**Ответ:**  
+- Можно взять адреса из сети для CGNAT - 100.64.0.0/10:   
+```
+$ ipcalc -b 100.64.0.0/10 -s 40
+Address:   100.64.0.0           
+Netmask:   255.192.0.0 = 10
+Wildcard:  0.63.255.255
+=>
+Network:   100.64.0.0/10
+HostMin:   100.64.0.1
+HostMax:   100.127.255.254
+Broadcast: 100.127.255.255
+Hosts/Net: 4194302               Class A
+
+1. Requested size: 40 hosts
+Netmask:   255.255.255.192 = 26 
+Network:   100.64.0.0/26
+HostMin:   100.64.0.1
+HostMax:   100.64.0.62
+Broadcast: 100.64.0.63
+Hosts/Net: 62                    Class A
+```  
+- Точно в диапазоне 40-50 адресов не получится т.к. предыдущая маска /27 - это 30 хост адресов (мало), а следующая /26 - это уже 62 хост адреса.  
+7. *Как проверить ARP таблицу в Linux, Windows? Как очистить ARP кеш полностью? Как из ARP таблицы удалить только один нужный IP?*  
+**Ответ:**  
+Проверить таблицу можно так:  
+- Linux: `ip neigh`, `arp -n`  
+- Windows: `arp -a`  
+    
+
+В Linux полностью очистить ARP таблицу штатными средствами нельзя. Можно использовать скрипт или команду: `sudo ip neigh flush all`. Эта команда для всех пунктов состояния задает failed. В дальнейшем ядро операционной системы удалит помеченные MAC адреса.  
+- В Windows очищаем кэш так: `arp -d *`
+
+Удалить один IP можно так:
+
+- Linux: `ip neigh delete <IP> dev <INTERFACE>`, `arp -d <IP>`  
+- Windows: `arp -d <IP>`
+
+
+
+
 ###### 3.6
 ## ДЗ 3.6
 #### Компьютерные сети, лекция 1
