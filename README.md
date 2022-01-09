@@ -267,7 +267,7 @@ LISTEN    0        0                  [::]:111              [::]:*
 :68 - Используется клиентскими машинами для получения информации о динамической IP-адресации от DHCP-сервера.  
 5. *Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.*  
 **Ответ:**  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/imgNetDiagram.png)  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/NetDiagram.png)  
 
 
 ###### 3.7
