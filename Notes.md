@@ -3,3 +3,10 @@
 netdata failed to build...  
 ./packaging/installer/install-required-packages.sh --dont-wait --non-interactive netdata  
 sudo ./netdata-installer.sh
+
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+
+dig @8.8.8.8 download.docker.com
+
+dig @8.8.4.4 download.docker.com
+

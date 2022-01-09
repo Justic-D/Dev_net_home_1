@@ -1,4 +1,275 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 3.8
+## ДЗ 3.8
+#### Компьютерные сети, лекция 3
+1. *Подключитесь к публичному маршрутизатору в интернет. Найдите маршрут к вашему публичному IP*  
+```
+telnet route-views.routeviews.org
+Username: rviews
+show ip route x.x.x.x/32
+show bgp x.x.x.x/32
+```  
+**Ответ:**  
+```
+route-views>show ip route 31.185.7.234
+Routing entry for 31.185.0.0/21
+  Known via "bgp 6447", distance 20, metric 0
+  Tag 6939, type external
+  Last update from 64.71.137.241 3w6d ago
+  Routing Descriptor Blocks:
+  * 64.71.137.241, from 64.71.137.241, 3w6d ago
+      Route metric is 0, traffic share count is 1
+      AS Hops 2
+      Route tag 6939
+      MPLS label: none
+```
+```
+route-views>show bgp 31.185.7.234
+BGP routing table entry for 31.185.0.0/21, version 1413162774
+Paths: (23 available, best #23, table default)
+  Not advertised to any peer
+  Refresh Epoch 1
+  57866 28917 48573
+    37.139.139.17 from 37.139.139.17 (37.139.139.17)
+      Origin IGP, metric 0, localpref 100, valid, external
+      Community: 0:6939 0:16276 28917:2000 28917:5110 28917:5112 28917:5171 28917:5334 57866:304 57866:501
+      path 7FE12FE7A198 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  53767 174 174 3257 28917 48573
+    162.251.163.2 from 162.251.163.2 (162.251.162.3)
+      Origin IGP, localpref 100, valid, external
+      Community: 174:21000 174:22013 53767:5000
+      path 7FE10AD169E0 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  3333 1257 28917 48573
+    193.0.0.56 from 193.0.0.56 (193.0.0.56)
+      Origin IGP, localpref 100, valid, external
+      Community: 1257:50 1257:51 1257:2000 1257:3428 1257:4103 28917:2000 28917:5110 28917:5112 28917:5171 28917:5334
+      path 7FE168FAD918 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 3
+  3303 28917 48573
+    217.192.89.50 from 217.192.89.50 (138.187.128.158)
+      Origin IGP, localpref 100, valid, external
+      Community: 3303:1004 3303:1006 3303:1030 3303:3056 28917:2000 28917:5112 28917:5122
+      path 7FE04BEF9DF8 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  7018 3257 28917 48573
+    12.0.1.63 from 12.0.1.63 (12.0.1.63)
+      Origin IGP, localpref 100, valid, external
+      Community: 7018:5000 7018:37232
+      path 7FE0AEEC3CE8 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  1351 6939 48573
+    132.198.255.253 from 132.198.255.253 (132.198.255.253)
+      Origin IGP, localpref 100, valid, external
+      path 7FE053C49510 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  20912 3257 28917 48573
+    212.66.96.126 from 212.66.96.126 (212.66.96.126)
+      Origin IGP, localpref 100, valid, external
+      Community: 3257:4000 3257:8133 3257:50001 3257:50110 3257:54901 20912:65004
+      path 7FE17B64F788 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 2
+  8283 28917 48573
+    94.142.247.3 from 94.142.247.3 (94.142.247.3)
+      Origin IGP, metric 0, localpref 100, valid, external
+      Community: 0:6939 0:16276 8283:1 8283:101 28917:2000 28917:5110 28917:5112 28917:5171 28917:5334
+      unknown transitive attribute: flag 0xE0 type 0x20 length 0x18
+        value 0000 205B 0000 0000 0000 0001 0000 205B
+              0000 0005 0000 0001
+      path 7FE0D6930FE8 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  3549 3356 3257 28917 48573
+    208.51.134.254 from 208.51.134.254 (67.16.168.191)
+      Origin IGP, metric 0, localpref 100, valid, external
+      Community: 3257:3257 3356:3 3356:22 3356:86 3356:575 3356:666 3356:903 3356:2011 3549:2581 3549:30840
+      path 7FE144948C60 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  3356 3257 28917 48573
+    4.68.4.46 from 4.68.4.46 (4.69.184.201)
+      Origin IGP, metric 0, localpref 100, valid, external
+      Community: 3257:3257 3356:3 3356:86 3356:576 3356:666 3356:903 3356:2012
+      path 7FE1338AFF50 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  20130 6939 48573
+    140.192.8.16 from 140.192.8.16 (140.192.8.16)
+      Origin IGP, localpref 100, valid, external
+      path 7FE128FDF6A8 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  852 3257 28917 48573
+    154.11.12.212 from 154.11.12.212 (96.1.209.43)
+      Origin IGP, metric 0, localpref 100, valid, external
+      path 7FE01E88C4B0 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  101 174 3257 28917 48573
+    209.124.176.223 from 209.124.176.223 (209.124.176.223)
+      Origin IGP, localpref 100, valid, external
+      Community: 101:20100 101:20110 101:22100 174:21000 174:22013
+      Extended Community: RT:101:22100
+      path 7FE0CD0EB0C0 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  7660 2516 3257 28917 48573
+    203.181.248.168 from 203.181.248.168 (203.181.248.168)
+      Origin IGP, localpref 100, valid, external
+      Community: 2516:1030 7660:9003
+      path 7FE0375A3530 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  2497 3257 28917 48573
+    202.232.0.2 from 202.232.0.2 (58.138.96.254)
+      Origin IGP, localpref 100, valid, external
+      path 7FE0D9774188 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  49788 12552 28917 48573
+    91.218.184.60 from 91.218.184.60 (91.218.184.60)
+      Origin IGP, localpref 100, valid, external
+      Community: 12552:12000 12552:12100 12552:12101 12552:22000
+      Extended Community: 0x43:100:1
+      path 7FE0C51ACEE0 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  1221 4637 3257 28917 48573
+    203.62.252.83 from 203.62.252.83 (203.62.252.83)
+      Origin IGP, localpref 100, valid, external
+      path 7FE0B96BAC88 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  701 3257 28917 48573
+    137.39.3.55 from 137.39.3.55 (137.39.3.55)
+      Origin IGP, localpref 100, valid, external
+      path 7FE122B4FA70 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  3257 28917 48573
+    89.149.178.10 from 89.149.178.10 (213.200.83.26)
+      Origin IGP, metric 10, localpref 100, valid, external
+      Community: 3257:4000 3257:8133 3257:50001 3257:50110 3257:54901
+      path 7FE138999238 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  19214 3257 28917 48573
+    208.74.64.40 from 208.74.64.40 (208.74.64.40)
+      Origin IGP, localpref 100, valid, external
+      Community: 3257:4000 3257:8133 3257:50001 3257:50110 3257:54901
+      path 7FE00D1EE498 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  4901 6079 3257 28917 48573
+    162.250.137.254 from 162.250.137.254 (162.250.137.254)
+      Origin IGP, localpref 100, valid, external
+      Community: 65000:10100 65000:10300 65000:10400
+      path 7FE147BEF7D8 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  3561 209 3356 3257 28917 48573
+    206.24.210.80 from 206.24.210.80 (206.24.210.80)
+      Origin IGP, localpref 100, valid, external
+      path 7FE15FA669A0 RPKI State not found
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  6939 48573
+    64.71.137.241 from 64.71.137.241 (216.218.252.164)
+      Origin IGP, localpref 100, valid, external, best
+      path 7FE131BB4318 RPKI State not found
+      rx pathid: 0, tx pathid: 0x0
+```
+2. *Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.*  
+**Ответ:**  
+- Запуск модуля  
+```  
+# echo "dummy" > /etc/modules-load.d/dummy.conf
+# echo "options dummy numdummies=2" > /etc/modprobe.d/dummy.conf
+```  
+- Настройка интерфейса  
+```  
+# cat << "EOF" >> /etc/systemd/network/10-dummy0.netdev
+[NetDev]
+Name=dummy0
+Kind=dummy
+EOF
+
+# cat << "EOF" >> /etc/systemd/network/20-dummy0.network
+[Match]
+Name=dummy0
+
+[Network]
+Address=10.0.8.1/24
+EOF
+
+# systemctl restart systemd-networkd
+```  
+- Добавление статического маршрута  
+```  
+# vi /etc/netplan/network_stat.yaml
+network:
+  version: 2
+  ethernets:
+    eth0:
+      optional: true
+      addresses:
+        - 10.0.2.3/24
+      routes:
+        - to: 10.0.4.0/24
+          via: 10.0.2.2
+```  
+- Таблица маршрутизации  
+```  
+$ ip r
+default via 10.0.2.2 dev eth0 proto dhcp src 10.0.2.15 metric 100
+10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.3
+10.0.2.2 dev eth0 proto dhcp scope link src 10.0.2.15 metric 100
+10.0.4.0/24 via 10.0.2.2 dev eth0 proto static
+10.0.8.0/24 dev dummy0 proto kernel scope link src 10.0.8.1
+``` 
+- Статический маршрут  
+```  
+$ ip r | grep static
+10.0.4.0/24 via 10.0.2.2 dev eth0 proto static
+```  
+3. *Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.*  
+**Ответ:**  
+```
+$ ss -tnlp
+State     Recv-Q   Send-Q    Local Address:Port     Peer Address:Port     Process
+LISTEN    0        4096            0.0.0.0:111           0.0.0.0:*
+LISTEN    0        4096      127.0.0.53%lo:53            0.0.0.0:*
+LISTEN    0        128             0.0.0.0:22            0.0.0.0:*
+LISTEN    0        4096               [::]:111              [::]:*
+LISTEN    0        128                [::]:22               [::]:*
+```  
+:53 - DNS  
+:22 - SSH  
+4. *Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?*  
+**Ответ:**  
+```
+$ ss -unap
+State     Recv-Q   Send-Q    Local Address:Port     Peer Address:Port     Process
+LISTEN    0        0         127.0.0.53%lo:53            0.0.0.0:*
+LISTEN    0        0        10.0.2.15%eth0:68            0.0.0.0:*
+LISTEN    0        0               0.0.0.0:111           0.0.0.0:*
+LISTEN    0        0                  [::]:111              [::]:*
+```
+:53 - DNS  
+:68 - Используется клиентскими машинами для получения информации о динамической IP-адресации от DHCP-сервера.  
+5. *Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.*  
+**Ответ:**  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/imgNetDiagram.png)  
+
+
 ###### 3.7
 ## ДЗ 3.7
 #### Компьютерные сети, лекция 2
@@ -81,7 +352,8 @@ Ethernet adapter Сетевое подключение Bluetooth 2:
    Physical Address. . . . . . . . . : 00-1A-7D-DA-71-10
    DHCP Enabled. . . . . . . . . . . : Yes
    Autoconfiguration Enabled . . . . : Yes
-```
+```  
+
 2. *Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?*  
 **Ответ:**  
 - Протокол LLDP.  
