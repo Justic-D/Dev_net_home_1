@@ -82,8 +82,8 @@ $ sudo a2enconf ssl-params
 $ sudo apache2ctl configtest
 $ sudo systemctl restart apache2
 ```  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.9_3.jpg)  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.9_4.jpg)  
+   ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.9_3.jpg)  
+   ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.9_4.jpg)  
 4. *Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).*  
 **Ответ:**  
 ```shell
@@ -163,7 +163,7 @@ tcpdump: listening on any, link-type LINUX_SLL (Linux cooked v1), capture size 2
 101 packets received by filter
 0 packets dropped by kernel
 ```  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.9_5.jpg)
+   ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3.9_5.jpg)
 
 
 
