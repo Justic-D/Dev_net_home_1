@@ -22,7 +22,8 @@ Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-80-generic x86_64)
 This system is built by the Bento project by Chef Software
 More information can be found at https://github.com/chef/bento
 ```  
-2. *Установите ufw и разрешите к этой машине сессии на порты 22 и 443, при этом трафик на интерфейсе localhost (lo) должен ходить свободно на все порты.*  
+2. *Установите ufw и разрешите к этой машине сессии на порты 22 и 443, при этом трафик на интерфейсе localhost (lo) 
+должен ходить свободно на все порты.*  
 
 **Ответ:**  
 ```bash
@@ -52,20 +53,8 @@ To                         Action      From
 **Ответ:**  
  - Установим и обновим необходимые зависимости:  
 ```bash
-#!/bin/bash
-
-sudo apt-get -y update
-sudo apt-get -y upgrade
-sudo apt-get install -y wget
-sudo apt-get install -y unzip
-sudo apt-get install -y postgresql postgresql-contrib
-sudo apt-get install -y nginx
-
-# Certbot
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:certbot/certbot
-sudo apt-get -y update
-sudo apt-get install -y python-certbot-nginx 
+vagrant@vagrant:~$ sudo apt-get -y update
+vagrant@vagrant:~$ sudo apt-get -y upgrade 
 ```  
   - Установим Vault:
 ```bash
@@ -104,7 +93,8 @@ Other commands:
     ssh            Initiate an SSH session
     token          Interact with tokens
 ```
-4. *Создайте центр сертификации по инструкции и выпустите сертификат для использования его в настройке веб-сервера nginx (срок жизни сертификата - месяц).*  
+4. *Создайте центр сертификации по инструкции и выпустите сертификат для использования его в настройке веб-сервера 
+nginx (срок жизни сертификата - месяц).*  
 
 **Ответ:**  
 - Запускаем Valut server в dev-режиме в отдельном терминале:
@@ -116,7 +106,8 @@ vagrant@vagrant:~$ vault server -dev -dev-root-token-id root
                      Cgo: disabled
          Cluster Address: https://127.0.0.1:8201
               Go Version: go1.17.5
-              Listener 1: tcp (addr: "127.0.0.1:8200", cluster address: "127.0.0.1:8201", max_request_duration: "1m30s", max_request_size: "33554432", tls: "disabled")
+              Listener 1: tcp (addr: "127.0.0.1:8200", cluster address: "127.0.0.1:8201", \ 
+                         max_request_duration: "1m30s", max_request_size: "33554432", tls: "disabled")
                Log Level: info
                    Mlock: supported: true, enabled: false
            Recovery Mode: false
@@ -129,10 +120,10 @@ vagrant@vagrant:~$ vault server -dev -dev-root-token-id root
 ```  
 - Создадим переменные окружения:
 ```bash
-vagrant@vagrant:~$ export VAULT_ADDR='http://127.0.0.1:8200'
-vagrant@vagrant:~$ echo "XFiK+zKKSZp3FCkFj2yV7WsO0/rn9uraLKL7ku2fEmQ=" > unseal.key
-vagrant@vagrant:~$ export VAULT_DEV_ROOT_TOKEN_ID=s.10LMkBZJOYwrodPQnhK5rd0f
-vagrant@vagrant:~$ vault status
+root@vagrant:~# export VAULT_ADDR='http://127.0.0.1:8200'
+root@vagrant:~# export VAULT_TOKEN=root
+
+root@vagrant:~# vault status
 Key             Value
 ---             -----
 Seal Type       shamir
@@ -154,9 +145,12 @@ Success! Enabled the pki secrets engine at: pki/
 root@vagrant:~# vault secrets tune -max-lease-ttl=8760h pki
 Success! Tuned the secrets engine at: pki/
 
-root@vagrant:~# vault write -field=certificate pki/root/generate/internal common_name="example.com" ttl=87600h > CA_cert.crt
+root@vagrant:~# vault write -field=certificate pki/root/generate/internal \ 
+   common_name="myshelov.com" ttl=87600h > CA_cert.crt
 
-root@vagrant:~# vault write pki/config/urls issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" crl_distribution_points="http://127.0.0.1:8200/v1/pki/crl"
+root@vagrant:~# vault write pki/config/urls \     
+   issuing_certificates="$VAULT_ADDR/v1/pki/ca" \    
+   crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
 Success! Data written to: pki/config/urls
 
 root@vagrant:~# vault secrets enable -path=pki_int pki
@@ -168,31 +162,36 @@ Success! Tuned the secrets engine at: pki_int/
 root@vagrant:~# apt install jq
 ...
 
-root@vagrant:~# vault write -format=json pki_int/intermediate/generate/internal common_name="example.com Intermediate Authority" | jq -r '.data.csr' > pki_intermediate.csr
+root@vagrant:~# vault write -format=json pki_int/intermediate/generate/internal \ 
+   common_name="myshelov.com Intermediate Authority" | jq -r '.data.csr' > pki_intermediate.csr
 
-root@vagrant:~# vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr format=pem_bundle ttl="8760h" | jq -r '.data.certificate' > intermediate.cert.pem
+root@vagrant:~# vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr \ 
+   format=pem_bundle ttl="43800h" | jq -r '.data.certificate' > intermediate.cert.pem
 
 root@vagrant:~# vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
 Success! Data written to: pki_int/intermediate/set-signed
 
-root@vagrant:~# vault write pki_int/roles/example-dot-com allowed_domains="example.com" allow_subdomains=true max_ttl="4380h"
-Success! Data written to: pki_int/roles/example-dot-com
+root@vagrant:~# vault write pki_int/roles/myshelov-dot-com allowed_domains="myshelov.com" \
+   allow_subdomains=true max_ttl="720h"
+Success! Data written to: pki_int/roles/myshelov-dot-com
 
 root@vagrant:~# vault list pki_int/roles/
 Keys
 ----
-example-dot-com
+myshelov-dot-com
 ```  
- - Создаем сертификаты для devops.example.com
+ - Создаем сертификаты для devops.myshelov.com
 ```bash
-root@vagrant:~# vault write -format=json pki_int/issue/example-dot-com common_name="devops.example.com" ttl=720h > devops.example.com.crt
-root@vagrant:~# cat devops.example.com.crt
+root@vagrant:~# vault write -format=json pki_int/issue/myshelov-dot-com common_name="devops.myshelov.com" \ 
+   ttl=24h > devops.myshelov.com.crt
+   
+root@vagrant:~# cat devops.myshelov.com.crt
 ...
     "serial_number": "0e:fc:c4:1e:35:c5:76:13:e9:97:42:9e:12:f2:53:7d:6f:ea:e0:20"
 
-root@vagrant:~# cat devops.example.com.crt | jq -r .data.certificate > devops.example.com.crt.pem
-root@vagrant:~# cat devops.example.com.crt | jq -r .data.issuing_ca >> devops.example.com.crt.pem
-root@vagrant:~# cat devops.example.com.crt | jq -r .data.private_key > devops.example.com.crt.key
+root@vagrant:~# cat devops.myshelov.com.crt | jq -r .data.certificate > devops.myshelov.com.crt.pem
+root@vagrant:~# cat devops.myshelov.com.crt | jq -r .data.issuing_ca >> devops.myshelov.com.crt.pem
+root@vagrant:~# cat devops.myshelov.com.crt | jq -r .data.private_key > devops.myshelov.com.crt.key
  ```  
 5. *Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.*  
 
@@ -234,22 +233,22 @@ Jan 31 20:36:08 vagrant systemd[1]: Started A high performance web server and a 
 root@vagrant:~# vi /etc/hosts
 127.0.0.1       localhost
 127.0.1.1       vagrant.vm      vagrant
-127.0.0.1       devops.example.com
+127.0.0.1       devops.myshelov.com
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
-root@vagrant:~# ping devops.example.com
-PING devops.example.com (127.0.0.1) 56(84) bytes of data.
+root@vagrant:~# ping devops.myshelov.com
+PING devops.myshelov.com (127.0.0.1) 56(84) bytes of data.
 64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.031 ms
 64 bytes from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.058 ms
 64 bytes from localhost (127.0.0.1): icmp_seq=3 ttl=64 time=0.059 ms
 64 bytes from localhost (127.0.0.1): icmp_seq=4 ttl=64 time=0.068 ms
 64 bytes from localhost (127.0.0.1): icmp_seq=5 ttl=64 time=0.050 ms
 ^C
---- devops.example.com ping statistics ---
+--- devops.myshelov.com ping statistics ---
 5 packets transmitted, 5 received, 0% packet loss, time 4097ms
 rtt min/avg/max/mdev = 0.031/0.053/0.068/0.012 ms
 ```  
@@ -294,10 +293,11 @@ Accept-Ranges: bytes
 ```
 root@vagrant:~# nano sert.sh
 #!/bin/bash
-vault write -format=json pki_int/issue/example-dot-com common_name="devops.example.com" ttl=720h > /root/devops.example.com.crt
-cat /root/devops.example.com.crt | jq -r .data.certificate > /root/devops.example.com.crt.pem
-cat /root/devops.example.com.crt | jq -r .data.issuing_ca >> /root/devops.example.com.crt.pem
-cat /root/devops.example.com.crt | jq -r .data.private_key > /root/devops.example.com.crt.key
+vault write -format=json pki_int/issue/example-dot-com common_name="devops.myshelov.com" \ 
+   ttl=720h > /root/devops.myshelov.com.crt
+cat /root/devops.myshelov.com.crt | jq -r .data.certificate > /root/devops.myshelov.com.crt.pem
+cat /root/devops.myshelov.com.crt | jq -r .data.issuing_ca >> /root/devops.myshelov.com.crt.pem
+cat /root/devops.myshelov.com.crt | jq -r .data.private_key > /root/devops.myshelov.com.crt.key
 systemctl reload nginx
 
 root@vagrant:~# chmod ugo+x sert.sh
