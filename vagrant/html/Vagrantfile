@@ -1,12 +1,12 @@
 Vagrant.configure("2") do |config|
     config.vm.box = "peru/ubuntu-20.04-server-amd64"
-    config.vm.box_version = "20220402.01"
+    config.vm.box_version = "20220202.01"
     config.vm.hostname = "server"
     config.vm.provider "virtualbox" do |vb|
     end
     config.vm.network "private_network", ip: "192.168.50.10"
     config.vm.synced_folder "html/", "/var/www/devops.myshelov.com/html"
     config.vm.provision "shell", path: "provision.sh"
-    config.vm.network "forwarded_port", guest: 80, host: 8082, id: "nginx"
-    config.vm.network "forwarded_port", guest: 80, host: 80, host_ip: "127.0.0.1"
+    #config.vm.network "forwarded_port", guest: 80, host: 8082, id: "nginx"
+    #config.vm.network "forwarded_port", guest: 80, host: 80, host_ip: "127.0.0.1"
 end

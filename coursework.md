@@ -263,15 +263,15 @@ server {
 
         listen 443 ssl default_server;
         listen [::]:443 ssl default_server;
-        ssl_certificate /root/devops.example.com.crt.pem;
-        ssl_certificate_key /root/devops.example.com.crt.key;
+        ssl_certificate /root/devops.myshelov.com.crt.pem;
+        ssl_certificate_key /root/devops.myshelov.com.crt.key;
 }
 
 root@vagrant:~# nginx -t
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 root@vagrant:~# systemctl reload nginx
-root@vagrant:~# curl -I https://devops.example.com
+root@vagrant:~# curl -I https://devops.myshelov.com
 HTTP/1.1 200 OK
 Server: nginx/1.18.0 (Ubuntu)
 Date: Mon, 31 Jan 2022 22:07:11 GMT
@@ -285,11 +285,12 @@ Accept-Ranges: bytes
 8. *Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.*  
 
 **Ответ:**  
-      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/zoo.jpg) 
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/1dv.jpg)  
+      ![](https://github.com/WiktorMysz/devops-netology/blob/main/img/2dv.jpg) 
 
 9. *Создайте скрипт, который будет генерировать новый сертификат в vault:*  
 - генерируем новый сертификат так, чтобы не переписывать конфиг nginx;
-- перезапускаем nginx для применения нового сертификата.
+- перезапускаем nginx для применения нового сертификата.  
 **Ответ:**  
 ```
 root@vagrant:~# nano sert.sh
@@ -303,6 +304,8 @@ systemctl reload nginx
 
 root@vagrant:~# chmod ugo+x sert.sh
 ```
+![](https://github.com/WiktorMysz/devops-netology/blob/main/img/3dv.jpg)  
+
 10. *Поместите скрипт в crontab, чтобы сертификат обновлялся какого-то числа каждого месяца в удобное для вас время.*  
 **Ответ:**  
 ```
