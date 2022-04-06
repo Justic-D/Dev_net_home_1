@@ -295,7 +295,7 @@ Accept-Ranges: bytes
 ```
 root@vagrant:~# nano sert.sh
 #!/bin/bash
-vault write -format=json pki_int/issue/example-dot-com common_name="devops.myshelov.com" \ 
+vault write -format=json pki_int/issue/myshelov-dot-com common_name="devops.myshelov.com" \ 
    ttl=720h > /root/devops.myshelov.com.crt
 cat /root/devops.myshelov.com.crt | jq -r .data.certificate > /root/devops.myshelov.com.crt.pem
 cat /root/devops.myshelov.com.crt | jq -r .data.issuing_ca >> /root/devops.myshelov.com.crt.pem
