@@ -1,0 +1,1 @@
+{"virtualbox":{"/var/www":{"mount_options":["dmode=777","fmode=666","uid=1000","gid=1000","_netdev"],"guestpath":"/var/www","hostpath":"D:/YandexDisk/DevOps-netology/vagrant_dir/webdev-master/www","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"D:/YandexDisk/DevOps-netology/vagrant_dir/webdev-master","disabled":false,"__vagrantfile":true}}}
