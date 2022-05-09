@@ -1,4 +1,187 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 5.2
+## ДЗ 5.2
+#### Применение принципов IaaC в работе с виртуальными машинами
+1. *Опишите своими словами основные преимущества применения на практике IaaC паттернов.*  
+**Ответ:**  
+```text
+- Скорость и уменьшение затрат: позволяет быстрее конфигурировать инфраструктуру и направлен на обеспечение прозрачности.
+- Восстановление в аварийных ситуациях: эффективный способ отслеживания вашей инфраструктуры и повторного развертывания
+последнего работоспособного состояния после сбоя или катастрофы любого рода.
+- Безопасность и документирование: за провижен всех вычислительных, сетевых и служб хранения отвечает код,
+они каждый раз будут развертываться одинаково. Т.к. код можно версионировать, IaaC позволяет документировать, регистрировать
+и отслеживать каждое изменение конфигурации вашего сервера.
+- Масштабируемость и стандартизация: развертывания инфраструктуры с помощью IaaC повторяемы и предотвращают проблемы во время
+выполнения, вызванных дрейфом конфигурации или отсутствием зависимостей. IaaC полностью стандартизирует сетап инфраструктуры,
+что снижает вероятность ошибок или отклонений.
+```  
+*Какой из принципов IaaC является основополагающим?*  
+**Ответ:**  
+```text
+Идемпотентность - свойство объекта или операции при повторном применении операции к объекту давать тот же результат,
+что и при первом.
+```  
+2. *Чем Ansible выгодно отличается от других систем управление конфигурациями?*  
+**Ответ:**  
+```text
+- При неуспешной доставке конфигурации на сервер, оповестит об этом.
+- Для описания конфигурационных файлов используется удобный для чтения формат YAML.
+- Работает без агента на клиентах, используя ssh для доступа.
+- Ansible Galaxy - огромное комьюнити, где можно найти практически любое решение.
+```  
+*Какой, на ваш взгляд, метод работы систем конфигурации более надёжный push или pull?*  
+**Ответ:**  
+```text
+Имееют права на жизнь оба метода. И различные инструменты управления конфигурацией заточены под тот или иной метод.
+Например, Chef, Puppet, CFEngine используют pull, Pulumi, Otter, Terraform, Ansible - push, а SaltStack, DSC - push/pull.
+По моему мнению push надёжней, т.к. централизованно управляет конфигурацией и исключает ситуации, когда прямое изменеие
+на сервере не отразится в репозитории, что может привести к непредсказуемым ситуациям. Хотя бытует мнение, что pull безопаснее,
+поскольку учетные данные кластера недоступны за его пределами. Но если кто-то проникнет в ваш репозиторий git и сможет push'ить
+туда код, то он сможет развернуть все, что пожелает (независимо от выбранного подхода, будет это pull или push),
+и внедриться в системы кластера. Таким образом, наиболее важными компонентами, требующими защиты, являются git-репозиторий
+и CI/CD-системы, а не учетные данные кластера.
+```  
+3. *Установить на личный компьютер:*  
+- *VirtualBox*  
+- *Vagrant*  
+- *Ansible*  
+  
+*Приложить вывод команд установленных версий каждой из программ, оформленный в markdown.*  
+**Ответ:** 
+```text
+Графический интерфейс VirtualBox
+Версия 6.1.34 r150636 (Qt5.6.2)
+```  
+```bash
+[user@DESKTOP-KCS3IDD vagrant2]$ vagrant -v
+Vagrant 2.2.19
+```  
+```bash
+[user@DESKTOP-KCS3IDD vagrant2]$ ansible --version
+ansible 2.9.27
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = ['/home/user/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python3.6/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 3.6.8 (default, Nov 10 2021, 06:50:23) [GCC 8.5.0 20210514 (Red Hat 8.5.0-3.0.2)]
+```  
+4. *Воспроизвести практическую часть лекции самостоятельно.*  
+    - Создать виртуальную машину.  
+    - Зайти внутрь ВМ, убедиться, что Docker установлен с помощью команды
+```
+docker ps
+```
+**Ответ:** 
+
+```bash
+[user@DESKTOP-KCS3IDD vagrant2]$ vagrant up
+Bringing machine 'server1.netology' up with 'virtualbox' provider...
+==> server1.netology: Importing base box 'bento/ubuntu-20.04'...
+==> server1.netology: Matching MAC address for NAT networking...
+==> server1.netology: Checking if box 'bento/ubuntu-20.04' version '202112.19.0' is up to date...
+==> server1.netology: Setting the name of the VM: server1.netology
+==> server1.netology: Clearing any previously set network interfaces...
+==> server1.netology: Preparing network interfaces based on configuration...
+    server1.netology: Adapter 1: nat
+    server1.netology: Adapter 2: hostonly
+==> server1.netology: Forwarding ports...
+    server1.netology: 22 (guest) => 20011 (host) (adapter 1)
+    server1.netology: 22 (guest) => 2222 (host) (adapter 1)
+    server1.netology: 22 (guest) => 2222 (host) (adapter 1)
+==> server1.netology: Running 'pre-boot' VM customizations...
+==> server1.netology: Booting VM...
+==> server1.netology: Waiting for machine to boot. This may take a few minutes...
+    server1.netology: SSH address: 172.30.176.1:2222
+    server1.netology: SSH username: vagrant
+    server1.netology: SSH auth method: password
+    server1.netology: Warning: Connection reset. Retrying...
+==> server1.netology: Machine booted and ready!
+==> server1.netology: Checking for guest additions in VM...
+==> server1.netology: Setting hostname...
+==> server1.netology: Configuring and enabling network interfaces...
+==> server1.netology: Running provisioner: ansible...
+    server1.netology: Running ansible-playbook...
+
+PLAY [nodes] *******************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [server1.netology]
+
+TASK [Checking DNS] ************************************************************
+changed: [server1.netology]
+
+TASK [Installing tools] ********************************************************
+[DEPRECATION WARNING]: Invoking "apt" only once while using a loop via 
+squash_actions is deprecated. Instead of using a loop to supply multiple items 
+and specifying `package: "{{ item }}"`, please use `package: ['git', 'curl']` 
+and remove the loop. This feature will be removed in version 2.11. Deprecation 
+warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.
+ok: [server1.netology] => (item=['git', 'curl'])
+
+TASK [Installing docker] *******************************************************
+[WARNING]: Consider using the get_url or uri module rather than running 'curl'.
+If you need to use command because get_url or uri is insufficient you can add
+'warn: false' to this command task or set 'command_warnings=False' in
+ansible.cfg to get rid of this message.
+changed: [server1.netology]
+
+TASK [Add the current user to docker group] ************************************
+changed: [server1.netology]
+
+PLAY RECAP *********************************************************************
+server1.netology           : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+[user@DESKTOP-KCS3IDD vagrant2]$ vagrant ssh
+==> server1.netology: The machine you're attempting to SSH into is configured to use
+==> server1.netology: password-based authentication. Vagrant can't script entering the
+==> server1.netology: password for you. If you're prompted for a password, please enter
+==> server1.netology: the same password you have configured in the Vagrantfile.
+vagrant@172.30.176.1's password: 
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+ System information disabled due to load higher than 1.0
+
+
+This system is built by the Bento project by Chef Software
+More information can be found at https://github.com/chef/bento
+Last login: Mon May  9 21:08:43 2022 from 10.0.2.2
+vagrant@server1:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+vagrant@server1:~$ docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+2db29710123e: Pull complete
+Digest: sha256:10d7d58d5ebd2a652f4d93fdd86da8f265f5318c6a73cc5b6a9798ff6d2b2e67
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+vagrant@server1:~$ 
+```
+
 ###### 5.1
 ## ДЗ 5.1
 #### Введение в виртуализацию. Типы и функции гипервизоров. Обзор рынка вендоров и областей применения.

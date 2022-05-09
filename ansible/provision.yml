@@ -1,0 +1,25 @@
+---
+#Provision some instances:
+- hosts: nodes
+  become: yes
+  become_user: root
+  remote_user: vagrant
+
+  tasks:
+    - name: Checking DNS
+      command: host -t A google.com
+
+    - name: Installing tools
+      apt: >
+        package={{ item }}
+        state=present
+        update_cache=yes
+      with_items:
+        - git
+        - curl
+
+    - name: Installing docker
+      shell: curl -fsSL get.docker.com -o get-docker.sh && chmod +x get-docker.sh && ./get-docker.sh
+
+    - name: Add the current user to docker group
+      user: name=vagrant append=yes groups=docker

@@ -1,12 +1,42 @@
-Vagrant.configure("2") do |config|
-    config.vm.box = "peru/ubuntu-20.04-server-amd64"
-    config.vm.box_version = "20220402.01"
-    config.vm.hostname = "server"
-    config.vm.provider "virtualbox" do |vb|
+ISO = "bento/ubuntu-20.04"
+NET = "192.168.56."
+DOMAIN = ".netology"
+HOST_PREFIX = "server"
+INVENTORY_PATH = "../ansible/inventory"
+
+servers = [
+  {
+    :hostname => HOST_PREFIX + "1" + DOMAIN,
+    :ip => NET + "11",
+    :ssh_host => "20011",
+    :ssh_vm => "22",
+    :ram => 1024,
+    :core => 1
+  }
+]
+
+Vagrant.configure(2) do |config|
+  config.vm.synced_folder ".", "/vagrant2", disabled: true
+  config.ssh.username = 'vagrant'
+  config.ssh.password = 'vagrant'
+  config.ssh.insert_key = false
+  servers.each do |machine|
+    config.vm.define machine[:hostname] do |node|
+      node.vm.box = ISO
+      node.vm.hostname = machine[:hostname]
+      node.vm.network "private_network", ip: machine[:ip]
+      node.vm.network :forwarded_port, guest: machine[:ssh_vm], host: machine[:ssh_host]
+      node.vm.provider "virtualbox" do |vb|
+        vb.customize ["modifyvm", :id, "--memory", machine[:ram]]
+        vb.customize ["modifyvm", :id, "--cpus", machine[:core]]
+        vb.name = machine[:hostname]
+      end
+      node.vm.provision "ansible" do |setup|
+        setup.inventory_path = INVENTORY_PATH
+        setup.playbook = "../ansible/provision.yml"
+        setup.become = true
+        setup.extra_vars = { ansible_user: 'vagrant' }
+      end
     end
-    config.vm.network "private_network", ip: "192.168.50.10"
-    config.vm.synced_folder "html/", "/var/www/devops.myshelov.com/html"
-    config.vm.provision "shell", path: "provision.sh"
-    config.vm.network "forwarded_port", guest: 80, host: 8082, id: "nginx"
-    config.vm.network "forwarded_port", guest: 80, host: 80, host_ip: "127.0.0.1"
+  end
 end
