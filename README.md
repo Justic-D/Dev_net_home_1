@@ -1,4 +1,163 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 5.3
+## ДЗ 5.3
+#### Введение. Экосистема. Архитектура. Жизненный цикл Docker контейнера
+1. *Сценарий выполнения задачи:*  
+- создайте свой репозиторий на https://hub.docker.com;  
+- выберете любой образ, который содержит веб-сервер Nginx;  
+- создайте свой fork образа;  
+- реализуйте функциональность: запуск веб-сервера в фоне с индекс-страницей, содержащей HTML-код ниже:  
+```html
+<html>
+<head>
+Hey, Netology
+</head>
+<body>
+<h1>I’m DevOps Engineer!</h1>
+</body>
+</html>
+```  
+*Опубликуйте созданный форк в своем репозитории и предоставьте ответ в виде ссылки на https://hub.docker.com/username_repo.*  
+**Ответ:**  
+```html
+vagrant@server1:/usr/share/nginx/html$ docker build -t mouser/devops-nginx:1.21.6 .
+Sending build context to Docker daemon  3.072kB
+Step 1/2 : FROM nginx:1.21.6
+ ---> 7425d3a7c478
+Step 2/2 : COPY index.html /usr/share/nginx/html/index.html
+ ---> 783d12a80b54
+Successfully built 783d12a80b54
+Successfully tagged mouser/devops-nginx:1.21.6
+vagrant@server1:/usr/share/nginx/html$ docker run --rm -d --name web -p 80:80  mouser/devops-nginx:1.21.6
+1312764dcab197f7d119b9e680e6f79c3c85d9ccc2547d2a9ec6a0adf5e10ae0
+vagrant@server1:/usr/share/nginx/html$ docker ps
+CONTAINER ID   IMAGE                        COMMAND                  CREATED              STATUS              PORTS                               NAMES
+1312764dcab1   mouser/devops-nginx:1.21.6   "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp, :::80->80/tcp   web
+vagrant@server1:/usr/share/nginx/html$ curl 192.168.56.11
+<html>
+        <head>
+                Hey, Netology
+        </head>
+        <body>
+                <h1>I’m DevOps Engineer!</h1>
+        </body>
+</html>
+vagrant@server1:/usr/share/nginx/html$ docker push mouser/devops-nginx:1.21.6
+The push refers to repository [docker.io/mouser/devops-nginx]
+524a373f3897: Pushed
+feb57d363211: Layer already exists
+98c84706d0f7: Layer already exists
+4311f0ea1a86: Layer already exists
+6d049f642241: Layer already exists
+3158f7304641: Layer already exists
+fd95118eade9: Layer already exists
+1.21.6: digest: sha256:1d95110593f3313e23948528e62313fb31836489ebd0ae0a3e1ff8269d65a136 size: 1777
+```  
+- Мой репозиторий: https://hub.docker.com/repository/docker/mouser/devops-nginx  
+2. *Посмотрите на сценарий ниже и ответьте на вопрос: "Подходит ли в этом сценарии использование Docker контейнеров или лучше подойдет виртуальная машина, физическая машина? Может быть возможны разные варианты?"*  
+  
+*Детально опишите и обоснуйте свой выбор.*
+
+--
+
+*Сценарий:*  
+**Ответ:**
+- *Высоконагруженное монолитное java веб-приложение;* 
+```text
+Физический сервер или VM предпочтительнее, т.к. монолитное и на микросервисы сложно разбить. К тому же высоконагруженное - 
+необходим прямой доступ к ресурсам.
+```  
+- *Nodejs веб-приложение;*  
+```text
+Контейнеризация подойдет для решения задачи, по сути node.js - это условно говоря environment для javascript для  
+построения логики работы веб-приложения, является его частью, модулем, хорошо укладывается в микро сервисную архитектуру.
+```  
+- *Мобильное приложение c версиями для Android и iOS;*  
+```text
+Предполагается, что приложение имеет своего потребителя, а значит необходим UI для взаимодействия с пользователем.  
+По моему мнению, корректнее всего использовать виртуализацию с реализацией виртуальной машины.
+```  
+- *Шина данных на базе Apache Kafka;*  
+```text
+Если среда рабочая и полнота данных критична, то лучше использовать VM; если среда тестовая и потеря данных некритична,
+можно использовать Docker.
+```  
+- *Elasticsearch кластер для реализации логирования продуктивного веб-приложения - три ноды elasticsearch, два logstash и две ноды kibana;*  
+```text
+Elasticsearvh лучше на VM, отказоустойчивость решается на уровне кластера, kibana и logstash можно вынести в Docker.
+```  
+- *Мониторинг-стек на базе Prometheus и Grafana;*  
+```text
+Подойдет Docker, так как данные не хранятся, и масштабировать легко.
+```  
+- *MongoDB, как основное хранилище данных для java-приложения;*  
+```text
+Зависит от нагрузки на DB. Если нагрузка большая, то физический сервер, если нет – VM.
+```  
+- *Gitlab сервер для реализации CI/CD процессов и приватный (закрытый) Docker Registry.*  
+```text
+Подойдет VM для DB и файлового хранилища, Docker для сервисов
+```  
+3.
+- *Запустите первый контейнер из образа centos c любым тэгом в фоновом режиме, подключив папку `/data` из текущей рабочей директории на хостовой машине в `/data` контейнера;*  
+- *Запустите второй контейнер из образа debian в фоновом режиме, подключив папку `/data` из текущей рабочей директории на хостовой машине в `/data` контейнера;*  
+- *Подключитесь к первому контейнеру с помощью docker exec и создайте текстовый файл любого содержания в `/data;`*  
+- *Добавьте еще один файл в папку /data на хостовой машине;*  
+- *Подключитесь во второй контейнер и отобразите листинг и содержание файлов в /data контейнера.*  
+**Ответ**  
+```text
+vagrant@server1:~$ docker run -it --rm -d --name centos -v $(pwd)/data:/data centos:latest
+Unable to find image 'centos:latest' locally
+latest: Pulling from library/centos
+a1d0c7532777: Pull complete
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:latest
+d76dd7bdd2824c635c524067011f4429438bcb29ab51537f296a4ecd017da43e
+```  
+```text
+vagrant@server1:~$ docker run -it --rm -d --name debian -v $(pwd)/data:/data debian:latest
+Unable to find image 'debian:latest' locally
+latest: Pulling from library/debian
+67e8aa6c8bbc: Pull complete
+Digest: sha256:6137c67e2009e881526386c42ba99b3657e4f92f546814a33d35b14e60579777
+Status: Downloaded newer image for debian:latest
+8a23ceda80292874024835e077e0668b275c788ec7b4121f3ed93d02fc47e690
+```  
+```text
+vagrant@server1:~$ docker exec -it centos bash
+[root@d76dd7bdd282 /]# echo "To be, or not to be..." >> /data/centos.txt
+[root@d76dd7bdd282 /]# exit
+exit
+```  
+```text
+vagrant@server1:~$ sudo su
+root@server1:/home/vagrant# echo "...that is the question" >> data/host.txt
+root@server1:/home/vagrant# 
+```  
+```text
+vagrant@server1:~$ docker exec -it debian bash
+root@8a23ceda8029:/# ls data/
+centos.txt  host.txt
+```  
+4. *Воспроизвести практическую часть лекции самостоятельно.*  
+   *Соберите Docker образ с Ansible, загрузите на Docker Hub и пришлите ссылку вместе с остальными ответами к задачам.*  
+  
+**Ответ**  
+```text
+vagrant@server1:/var/docker$ docker images
+REPOSITORY            TAG        IMAGE ID       CREATED              SIZE
+mouser/ansible        2.9.24     86ac5c8dee55   About a minute ago   245MB
+vagrant@server1:/var/docker$ docker push mouser/ansible:2.9.24
+The push refers to repository [docker.io/mouser/ansible]
+a9a1ed2baf61: Pushed
+9511e510707f: Pushed
+b541d28bf3b4: Mounted from library/alpine
+2.9.24: digest: sha256:e4583a25ed832b9d71f71235de4b7e627db969bffe4d95985bf32fff06a3ec76 size: 947
+```  
+- Мой репозиторий https://hub.docker.com/repository/docker/mouser/ansible
+
+
+
 ###### 5.2
 ## ДЗ 5.2
 #### Применение принципов IaaC в работе с виртуальными машинами

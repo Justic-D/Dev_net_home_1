@@ -17,6 +17,7 @@ servers = [
 
 Vagrant.configure(2) do |config|
   config.vm.synced_folder ".", "/vagrant2", disabled: true
+  config.vm.synced_folder "../Docker/", "/var/docker"
   config.ssh.username = 'vagrant'
   config.ssh.password = 'vagrant'
   config.ssh.insert_key = false
