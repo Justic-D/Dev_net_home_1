@@ -1,6 +1,228 @@
 # Репозиторий для домашних заданий по курсу DevOps
 ###### 6.2  
 ## ДЗ 6.2  
+#### MySQL  
+1. *Используя docker поднимите инстанс MySQL (версию 8). Данные БД сохраните в volume.*  
+**Ответ:**  
+docker-compose.yaml  
+```dockerfile
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8
+    ports:
+      - 3306:3306
+    volumes:
+      - ~/apps/mysql:/var/lib/mysql
+      - ~/config/conf.d:/etc/mysql/conf.d
+    environment:
+      - MYSQL_DATABASE=mytst_db
+      - MYSQL_ROOT_PASSWORD=mysh
+      - MYSQL_PASSWORD=mypass
+      - MYSQL_USER=test_user
+```  
+```bash
+vagrant@server1:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                                                  NAMES
+b11e225a1bf7   mysql:8   "docker-entrypoint.s…"   7 minutes ago   Up 7 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   stack_mysql_1
+vagrant@server1:~$ docker cp /var/docker/test_dump.sql stack_mysql_1:/tmp
+vagrant@server1:~$ docker exec -it stack_mysql_1 bash
+bash-4.4# mysql -u root -p mytst_db < /tmp/test_dump.sql
+Enter password: 
+bash-4.4#
+```  
+*Перейдите в управляющую консоль `mysql` внутри контейнера.*  
+```bash
+bash-4.4# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.30 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>
+```  
+*Используя команду `\h` получите список управляющих команд.*  
+*Найдите команду для выдачи статуса БД и приведите в ответе из ее вывода версию сервера БД.*  
+`mysql> \s`
+```bash
+Server version:         8.0.30 MySQL Community Server - GPL
+```  
+*Подключитесь к восстановленной БД и получите список таблиц из этой БД.*  
+```bash
+mysql> USE mytst_db;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> SHOW TABLES;
++--------------------+
+| Tables_in_mytst_db |
++--------------------+
+| orders             |
++--------------------+
+1 row in set (0.00 sec)
+```  
+*Приведите в ответе количество записей с `price` > 300.*  
+```bash
+mysql> SELECT COUNT(*) FROM orders WHERE price > 300;
++----------+
+| COUNT(*) |
++----------+
+|        1 |
++----------+
+1 row in set (0.01 sec)
+```  
+*В следующих заданиях мы будем продолжать работу с данным контейнером.*  
+2. *Создайте пользователя test в БД c паролем test-pass, используя:*  
+- *плагин авторизации mysql_native_password*   
+- *срок истечения пароля - 180 дней*   
+- *количество попыток авторизации - 3*   
+- *максимальное количество запросов в час - 100*   
+- *аттрибуты пользователя:*  
+    - *Фамилия "Pretty"*  
+    - *Имя "James"*  
+```bash
+mysql> CREATE USER 'test'@'localhost' 
+    ->     IDENTIFIED WITH mysql_native_password BY 'test-pass'
+    ->     WITH MAX_CONNECTIONS_PER_HOUR 100
+    ->     PASSWORD EXPIRE INTERVAL 180 DAY
+    ->     FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2
+    ->     ATTRIBUTE '{"first_name":"James", "last_name":"Pretty"}';
+Query OK, 0 rows affected (0.05 sec)
+```  
+*Предоставьте привилегии пользователю `test` на операции SELECT базы `test_db`.*  
+```bash
+mysql> GRANT SELECT ON test_db.* TO test@localhost;
+Query OK, 0 rows affected, 1 warning (0.07 sec)
+```  
+*Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю test и приведите в ответе к задаче.*  
+```bash
+mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER = 'test';
++------+-----------+------------------------------------------------+
+| USER | HOST      | ATTRIBUTE                                      |
++------+-----------+------------------------------------------------+
+| test | localhost | {"last_name": "Pretty", "first_name": "James"} |
++------+-----------+------------------------------------------------+
+1 row in set (0.01 sec)
+```  
+3. *Установите профилирование `SET profiling = 1`. Изучите вывод профилирования команд `SHOW PROFILES;`.*  
+*Исследуйте, какой `engine` используется в таблице БД `test_db` и приведите в ответе.*  
+```bash
+mysql> SELECT table_schema,table_name,engine FROM information_schema.tables WHERE table_schema = DATABASE();
++--------------+------------+--------+
+| TABLE_SCHEMA | TABLE_NAME | ENGINE |
++--------------+------------+--------+
+| mytst_db     | orders     | InnoDB |
++--------------+------------+--------+
+1 row in set (0.01 sec)
+```  
+*Измените engine и приведите время выполнения и запрос на изменения из профайлера в ответе:*  
+- *на `MyISAM`*  
+- *на `InnoDB`*  
+```bash
+mysql> SET profiling = 1;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> ALTER TABLE orders ENGINE = MyISAM;
+Query OK, 5 rows affected (0.10 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE orders ENGINE = InnoDB;
+Query OK, 5 rows affected (0.10 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SHOW PROFILES;
++----------+------------+------------------------------------+
+| Query_ID | Duration   | Query                              |
++----------+------------+------------------------------------+
+|        1 | 0.11033200 | ALTER TABLE orders ENGINE = MyISAM |
+|        2 | 0.10978375 | ALTER TABLE orders ENGINE = InnoDB |
++----------+------------+------------------------------------+
+2 rows in set, 1 warning (0.00 sec)
+```  
+4. *Изучите файл `my.cnf` в директории /etc/mysql.*  
+*Измените его согласно ТЗ (движок InnoDB):*  
+- Скорость IO важнее сохранности данных  
+- Нужна компрессия таблиц для экономии места на диске   
+- Размер буфера с незакомиченными транзакциями 1 Мб  
+- Буфер кеширования 30% от ОЗУ  
+- Размер файла логов операций 100 Мб  
+*Приведите в ответе измененный файл `my.cnf`.*  
+```bash
+vagrant@server1:~$ docker cp /var/docker/my.cnf stack_mysql_1:/etc/my.cnf
+vagrant@server1:~$ docker exec -it stack_mysql_1 bash
+bash-4.4# cat /etc/my.cnf
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/8.0/en/server-configuration-defaults.html
+
+[mysqld]
+#
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove leading # to turn on a very important data integrity option: logging
+# changes to the binary log between backups.
+# log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
+
+# Remove leading # to revert to previous value for default_authentication_plugin,
+# this will increase compatibility with older clients. For background, see:
+# https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin
+# default-authentication-plugin=mysql_native_password
+skip-host-cache
+skip-name-resolve
+datadir=/var/lib/mysql
+socket=/var/run/mysqld/mysqld.sock
+secure-file-priv=/var/lib/mysql-files
+user=mysql
+
+pid-file=/var/run/mysqld/mysqld.pid
+
+#Set IO Speed
+# 0 - скорость
+# 1 - сохранность
+# 2 - универсальный параметр
+innodb_flush_log_at_trx_commit = 0
+
+#Set compression
+# Barracuda - формат файла с сжатием
+innodb_file_format=Barracuda
+
+#Set buffer
+innodb_log_buffer_size  = 1M
+
+#Set Cache size
+key_buffer_size = 307М
+
+#Set log size
+max_binlog_size = 100M
+
+[client]
+socket=/var/run/mysqld/mysqld.sock
+
+!includedir /etc/mysql/conf.d/
+```
+
+
+
+###### 6.2  
+## ДЗ 6.2  
 #### SQL  
 1. *Используя docker поднимите инстанс PostgreSQL (версию 12) c 2 volume, в который будут складываться данные БД и бэкапы.*  
 *Приведите получившуюся команду или docker-compose манифест.*  
