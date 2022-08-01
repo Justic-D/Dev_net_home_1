@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: pg13
+    image: "postgres:13"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysh
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
