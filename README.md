@@ -383,7 +383,7 @@ CREATE RULE orders_insert_to_less AS ON INSERT TO orders WHERE ( price <= 499 ) 
 ```bash
 root@fbe4e44a6f52:/# export PGPASSWORD=mysh && pg_dump -h localhost -U postgres test_database > /tmp/test_database_backup.sql
 ```
-*Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца title для таблиц test_database?*  
+*Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?*  
 **Ответ:** Нужно добавить свойство `UNIQUE`.
 ```bash 
 CREATE TABLE public.orders (
