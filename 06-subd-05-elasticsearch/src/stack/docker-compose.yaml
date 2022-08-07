@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  elasticsearch:
+    container_name: es-docker
+    image: podkovka/devops-elasticsearch:7.17
+    restart: always
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+      - node.name=netology_test
+      - cluster.name=netology_cluster
+    volumes:
+      - elast_data:/var/lib/elasticsearch
+      - elast_logs:/var/log/elasticsearch/log
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - es-net
+
+volumes:
+  elast_data:
+  elast_logs:
+
+networks:
+  es-net:
+    driver: bridge
