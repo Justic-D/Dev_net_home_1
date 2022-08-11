@@ -1,10 +1,9 @@
 # Манифест Docker образа.
 FROM centos:7
+RUN mkdir /ansible && \
+    mkdir -p /etc/ansible && \
+    echo 'localhost' > /etc/ansible/hosts
 
-EXPOSE 9200 9300
+WORKDIR /ansible
 
-USER 0
-
-RUN export ES_HOME="/var/lib/elasticsearch" && \
-    yum -y install wget && \
-    wget https://artifacts.elastic.co/downloads/elasticsearch/elas
+CMD ["ansible-playbook", "--version",  "/usr/sbin/init"]

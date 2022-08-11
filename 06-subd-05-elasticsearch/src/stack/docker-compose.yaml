@@ -7,12 +7,12 @@ services:
     restart: always
     environment:
       - xpack.security.enabled=false
-      - "discovery.type=single-node"
+      - discovery.type=single-node
       - node.name=netology_test
       - cluster.name=netology_cluster
     volumes:
-      - elast_data:/var/lib/elasticsearch
-      - elast_logs:/var/log/elasticsearch/log
+      - elast_data:/var/lib/elasticsearch/data
+      - elast_logs:/var/lib/elasticsearch/logs
     ports:
       - 9200:9200
       - 9300:9300

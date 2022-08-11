@@ -1,31 +1,28 @@
 FROM centos:7
 
-ENV PATH=/usr/lib:/usr/lib/jvm/jre-11/bin:$PATH
+EXPOSE 9200 9300
 
-RUN yum install java-11-openjdk -y
-RUN yum install wget -y
+USER 0
 
-RUN wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.3-linux-x86_64.tar.gz \
-    && wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.3-linux-x86_64.tar.gz.sha512
-RUN yum install perl-Digest-SHA -y
-RUN shasum -a 512 -c elasticsearch-8.3.3-linux-x86_64.tar.gz.sha512 \
-    && tar -xzf elasticsearch-8.3.3-linux-x86_64.tar.gz \
-    && yum upgrade -y
+RUN export ES_HOME="/var/lib/elasticsearch" && \
+    yum -y install wget && \
+    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.3-linux-x86_64.tar.gz && \
+    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.3-linux-x86_64.tar.gz.sha512 && \
+    sha512sum -c elasticsearch-8.3.3-linux-x86_64.tar.gz.sha512 && \
+    tar -xzf elasticsearch-8.3.3-linux-x86_64.tar.gz && \
+    rm -f elasticsearch-8.3.3-linux-x86_64.tar.gz* && \
+    mv elasticsearch-8.3.3 ${ES_HOME} && \
+    useradd -m -u 1000 elasticsearch && \
+    chown elasticsearch:elasticsearch -R ${ES_HOME} && \
+    yum -y remove wget && \
+    yum clean all
 
-ADD elasticsearch.yml /elasticsearch-8.3.3/config/
-ENV JAVA_HOME=/elasticsearch-8.3.3/jdk/
-ENV ES_HOME=/elasticsearch-8.3.3
-RUN groupadd elasticsearch \
-    && useradd -g elasticsearch elasticsearch
+COPY --chown=elasticsearch:elasticsearch config/* /var/lib/elasticsearch/config/
 
-RUN mkdir /var/lib/logs \
-    && chown elasticsearch:elasticsearch /var/lib/logs \
-    && mkdir /var/lib/data \
-    && chown elasticsearch:elasticsearch /var/lib/data \
-    && chown -R elasticsearch:elasticsearch /elasticsearch-8.3.3/
-RUN mkdir /elasticsearch-8.3.3/snapshots &&\
-    chown elasticsearch:elasticsearch /elasticsearch-8.3.3/snapshots
+USER 1000
 
-USER elasticsearch
-CMD ["/usr/sbin/init"]
-CMD ["/elasticsearch-8.3.3/bin/elasticsearch"]
+ENV ES_HOME="/var/lib/elasticsearch" \
+    ES_PATH_CONF="/var/lib/elasticsearch/config"
+WORKDIR ${ES_HOME}
+
+CMD ["sh", "-c", "${ES_HOME}/bin/elasticsearch"]

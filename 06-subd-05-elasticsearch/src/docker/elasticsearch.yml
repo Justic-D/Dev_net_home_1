@@ -14,14 +14,13 @@
 #
 # Use a descriptive name for your cluster:
 #
-#cluster.name: netology_cluster
-#discovery.type: single-node
+cluster.name: netology_cluster
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-#node.name: netology_test
+node.name: netology_test
 #
 # Add custom attributes to the node:
 #
@@ -31,17 +30,11 @@
 #
 # Path to directory where to store the data (separate multiple locations by comma):
 #
-#path.data: /var/lib/data
+path.data: /var/lib/elasticsearch/data
 #
 # Path to log files:
 #
-#path.logs: /var/lib/logs
-
-#Settings REPOSITORY PATH
-#for Image from YUM (esp)
-#path.repo: /usr/share/elasticsearch/snapshots
-#for Image from TAR (est)
-#path.repo: /elasticsearch-8.3.3/snapshots
+path.logs: /var/lib/elasticsearch/logs
 #
 # ----------------------------------- Memory -----------------------------------
 #
@@ -57,13 +50,16 @@
 #
 # ---------------------------------- Network -----------------------------------
 #
-# Set the bind address to a specific IP (IPv4 or IPv6):
+# By default Elasticsearch is only accessible on localhost. Set a different
+# address here to expose this node on the network:
 #
-#network.host: 0.0.0.0
+http.host: 0.0.0.0
+network.host: 127.0.0.1
 #
-# Set a custom port for HTTP:
+# By default Elasticsearch listens for HTTP traffic on the first free port it
+# finds starting at 9200. Set a specific HTTP port here:
 #
-#http.port: 9200
+http.port: 9200
 #
 # For more information, consult the network module documentation.
 #
@@ -72,7 +68,7 @@
 # Pass an initial list of hosts to perform discovery when this node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-#discovery.seed_hosts: ["127.0.0.1", "[::1]"]
+#discovery.seed_hosts: ["host1", "host2"]
 #
 # Bootstrap the cluster using an initial set of master-eligible nodes:
 #
@@ -80,17 +76,25 @@
 #
 # For more information, consult the discovery and cluster formation module documentation.
 #
-# ---------------------------------- Gateway -----------------------------------
-#
-# Block initial recovery after a full cluster restart until N nodes are started:
-#
-#gateway.recover_after_nodes: 3
-#
-# For more information, consult the gateway module documentation.
-#
 # ---------------------------------- Various -----------------------------------
 #
 # Require explicit names when deleting indices:
 #
 #action.destructive_requires_name: true
+#
+# ---------------------------------- Security ----------------------------------
+#
+#                                 *** WARNING ***
+#
+# Elasticsearch security features are not enabled by default.
+# These features are free, but require configuration changes to enable them.
+# This means that users don’t have to provide credentials and can get full access
+# to the cluster. Network connections are also not encrypted.
+#
+# To protect your data, we strongly encourage you to enable the Elasticsearch security features.
+# Refer to the following documentation for instructions.
+#
+# https://www.elastic.co/guide/en/elasticsearch/reference/7.16/configuring-stack-security.html
+#ingest.geoip.downloader.enabled: false
+path.repo: /var/lib/elasticsearch/snapshots
 

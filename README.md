@@ -50,6 +50,11 @@ WORKDIR ${ES_HOME}
 
 CMD ["sh", "-c", "${ES_HOME}/bin/elasticsearch"]
 ```  
+```bash
+vagrant@server1:~$ docker build /var/docker -t mouser/es-dock:8.3.3
+vagrant@server1:~$ docker login -u "mouser" -p "******" docker.io
+vagrant@server1:~$ docker push mouser/es-dock:8.3.3
+```
 - ссылку на образ в репозитории dockerhub:  https://hub.docker.com/repository/docker/mouser/es-dock  
   
 
@@ -88,8 +93,8 @@ networks:
 - ответ `elasticsearch` на запрос пути `/` в json виде:  
 ```bash
 vagrant@server1:~$ docker ps
-CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS          PORTS                                                                                  NAMES
-5f9991d36b32   mouser/es-dock:8.3.3   "sh -c ${ES_HOME}/bi…"   16 minutes ago   Up 16 minutes   0.0.0.0:9200->9200/tcp, :::9200->9200/tcp, 0.0.0.0:9300->9300/tcp, :::9300->9300/tcp   es-docker
+CONTAINER ID   IMAGE                  COMMAND                  CREATED              STATUS         PORTS                                                                                  NAMES
+0ee4dad0fbcf   mouser/es-dock:8.3.3   "sh -c ${ES_HOME}/bi…"   About a minute ago   Up 6 seconds   0.0.0.0:9200->9200/tcp, :::9200->9200/tcp, 0.0.0.0:9300->9300/tcp, :::9300->9300/tcp   es-docker
 vagrant@server1:~$ curl -X GET 'localhost:9200/'
 {
   "name" : "netology_test",
@@ -207,7 +212,7 @@ vagrant@server1:~$ curl -X GET "localhost:9200/_cluster/health?pretty"
 Как вы думаете, почему часть индексов и кластер находится в состоянии yellow?*  
 **Ответ:**  
 `Первичный шард и реплика не могут находиться на одном узле, если копия не назначена.`  
-Удалите все индексы.
+Удалите все индексы.  
 **Ответ:**  
 ```bash
 vagrant@server1:~$ curl -X DELETE 'http://localhost:9200/_all'
@@ -228,10 +233,10 @@ vagrant@server1:~$ docker exec -u root -it es-docker bash
 Используя API [зарегистрируйте](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-register-repository.html#snapshots-register-repository) 
 данную директорию как `snapshot repository` c именем `netology_backup`.
 ```bash
-# echo path.repo: [ "/var/lib/elasticsearch/snapshots" ] >> "$ES_HOME/config/elasticsearch.yml"
-# chown elasticsearch:elasticsearch /var/lib/elasticsearch/snapshots
-$ docker restart elastic
-$ curl -X PUT "localhost:9200/_snapshot/netology_backup?pretty" -H 'Content-Type: application/json' -d'
+root@server1:~# echo path.repo: [ "/var/lib/elasticsearch/snapshots" ] >> "$ES_HOME/config/elasticsearch.yml"
+root@server1:~# chown elasticsearch:elasticsearch /var/lib/elasticsearch/snapshots
+vagrant@server1:~$ docker restart elastic
+vagrant@server1:~$ curl -X PUT "localhost:9200/_snapshot/netology_backup?pretty" -H 'Content-Type: application/json' -d'
 {
   "type": "fs",
   "settings": {
@@ -241,7 +246,76 @@ $ curl -X PUT "localhost:9200/_snapshot/netology_backup?pretty" -H 'Content-Type
 }'
 {"acknowledged":true}
 ```
+**Приведите в ответе** запрос API и результат вызова API для создания репозитория.
 
+Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
+
+```bash
+vagrant@server1:~$ curl -X PUT "localhost:9200/test?pretty" -H 'Content-Type: application/json' -d'
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}
+'
+vagrant@server1:~$ curl 'localhost:9200/_cat/indices?v'
+health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .geoip_databases G7ERWc-VSmgkes4p8FNSZj   1   0         41            0     68.3mb         68.3mb
+green  open   test             f-HEU6CQUMySiKoabuAml7O   1   0          0            0       226b           226b
+```
+
+[Создайте `snapshot`](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-take-snapshot.html) 
+состояния кластера `elasticsearch`.
+
+```bash
+vagrant@server1:~$ curl -X PUT "localhost:9200/_snapshot/netology_backup/snapshot_1?wait_for_completion=true&pretty"
+```
+**Приведите в ответе** список файлов в директории со `snapshot`ами.  
+```bash
+vagrant@server1:~$ docker exec -it elastic ls -l /var/lib/elasticsearch/snapshots/
+total 28
+-rw-r--r-- 1 elasticsearch elasticsearch 1422 Aug 11 22:53 index-0
+-rw-r--r-- 1 elasticsearch elasticsearch    8 Aug 11 22:53 index.latest
+drwxr-xr-x 6 elasticsearch elasticsearch 4096 Aug 11 22:53 indices
+-rw-r--r-- 1 elasticsearch elasticsearch 9688 Aug 11 22:53 meta--6LwuuAUhKdSY_XwlcAJ8i.dat
+-rw-r--r-- 1 elasticsearch elasticsearch  452 Aug 11 22:53 snap--6LwuuAUhKdSY_XwlcAJ8i.dat
+```  
+Удалите индекс `test` и создайте индекс `test-2`. **Приведите в ответе** список индексов.  
+```bash
+vagrant@server1:~$ curl -X DELETE "localhost:9200/test?pretty"
+vagrant@server1:~$ curl -X PUT "localhost:9200/test-2?pretty" -H 'Content-Type: application/json' -d'
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}
+'
+vagrant@server1:~$ curl 'localhost:9200/_cat/indices?pretty'
+green open .geoip_databases L5XWBp-KXskrvu1u0PDCРq 1 0 41 0 38.6mb 38.6mb
+green open test-2           Ye_UzOFPEXlMZ4aTXrP1sd 1 0  0 0   226b   226b
+```
+
+[Восстановите](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-restore-snapshot.html) состояние
+кластера `elasticsearch` из `snapshot`, созданного ранее. 
+
+**Приведите в ответе** запрос к API восстановления и итоговый список индексов.  
+```bash
+vagrant@server1:~$ curl -X POST "localhost:9200/_snapshot/netology_backup/snapshot_1/_restore?pretty" -H 'Content-Type: application/json' -d'
+{
+  "indices": "*",
+  "include_global_state": true
+}
+'
+```  
+```bash
+vagrant@server1:~$ curl 'localhost:9200/_cat/indices?pretty'
+green open .geoip_databases beMNExPsWjhOCEoWExIPXq 1 0 41 0 38.6mb 38.6mb
+green open test             LrDjXE_RD_evynSvSwOHdw 1 0  0 0   226b   226b
+```  
+Подсказки:
+- возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`
 
 
 

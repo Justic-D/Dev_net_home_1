@@ -1,4 +1,4 @@
 [nodes:children]
 manager
 [manager]
-server1.netology ansible_host=172.17.16.1 ansible_port=2222 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+server1.netology ansible_host=172.27.208.1 ansible_port=2222 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
