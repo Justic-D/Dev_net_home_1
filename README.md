@@ -233,8 +233,8 @@ vagrant@server1:~$ docker exec -u root -it es-docker bash
 Используя API [зарегистрируйте](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-register-repository.html#snapshots-register-repository) 
 данную директорию как `snapshot repository` c именем `netology_backup`.
 ```bash
-root@server1:~# echo path.repo: [ "/var/lib/elasticsearch/snapshots" ] >> "$ES_HOME/config/elasticsearch.yml"
-root@server1:~# chown elasticsearch:elasticsearch /var/lib/elasticsearch/snapshots
+[root@5f9991d36b32 elasticsearch]# echo path.repo: [ "/var/lib/elasticsearch/snapshots" ] >> "$ES_HOME/config/elasticsearch.yml"
+[root@5f9991d36b32 elasticsearch]# chown elasticsearch:elasticsearch /var/lib/elasticsearch/snapshots
 vagrant@server1:~$ docker restart elastic
 vagrant@server1:~$ curl -X PUT "localhost:9200/_snapshot/netology_backup?pretty" -H 'Content-Type: application/json' -d'
 {
