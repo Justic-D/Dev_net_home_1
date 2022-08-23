@@ -1,27 +1,6 @@
-
-#resource "random_pet" "pet_name" {
-#  length    = 3
-#  separator = "-"
-#}
-
 resource "aws_iam_user" "new_user" {
   name = "new_user"
 }
-
-#resource "aws_s3_bucket" "bucket" {
-#  bucket = "${random_pet.pet_name.id}-bucket"
-#
-#  tags = {
-#    Name        = "My bucket"
-#    Environment = "Dev"
-#  }
-#}
-
-#resource "aws_s3_bucket_acl" "bucket" {
-#  bucket = aws_s3_bucket.bucket.id
-#
-#  acl = "private"
-#}
 
 resource "aws_iam_policy" "policy" {
   name        = "My_new_policy"
@@ -224,4 +203,3 @@ resource "aws_iam_policy" "policy" {
 }
 EOT
 }
-
