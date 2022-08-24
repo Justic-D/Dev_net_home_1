@@ -70,7 +70,7 @@ for this configuration.
 ```bash
 [user@DESKTOP-KCS3IDD terraform]$ terraform plan -no-color > terraform_plan.txt
 ```  
-[terraform plan для `prod`](https://github.com/WiktorMysz/devops-netology/tree/main/Terraform/7.3/terraform_plan.txt)
+[terraform plan для `prod`](https://github.com/WiktorMysz/devops-netology/tree/main/Terraform/7.3/terraform_plan)
 
 
 ###### 7.2  
