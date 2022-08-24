@@ -1,4 +1,78 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 7.3  
+## ДЗ 7.3 
+#### Основы Terraform.  
+#### 1. *Создадим бэкэнд в S3 (необязательно, но крайне желательно).*  
+*Если в рамках предыдущего задания у вас уже есть аккаунт AWS, то давайте продолжим знакомство со взаимодействием
+терраформа и aws.*   
+
+1. *Создайте s3 бакет, iam роль и пользователя от которого будет работать терраформ. Можно создать отдельного пользователя,
+а можно использовать созданного в рамках предыдущего задания, просто добавьте ему необходимы права, как описано 
+[здесь](https://www.terraform.io/docs/backends/types/s3.html).*  
+2. *Зарегистрируйте бэкэнд в терраформ проекте как описано по ссылке выше.*   
+```bash
+[user@DESKTOP-KCS3IDD terraform]$ aws s3api create-bucket \
+>     --bucket wiktormys \
+>     --region eu-central-1 \
+>     --object-ownership BucketOwnerEnforced \
+>     --create-bucket-configuration LocationConstraint=eu-central-1
+{
+    "Location": "http://wiktormys.s3.amazonaws.com/"
+}
+
+```   
+```bash
+[user@DESKTOP-KCS3IDD terraform]$ aws s3 ls
+2022-08-24 02:20:16 wiktormys
+```  
+
+![](img/7.3_1.jpg)
+#### 2. *Инициализируем проект и создаем воркспейсы.*  
+1. *Выполните `terraform init`:*  
+    * *если был создан бэкэнд в S3, то терраформ создаст файл стейтов в S3 и запись в таблице 
+dynamodb.*  
+    * *иначе будет создан локальный файл со стейтами.*    
+2. *Создайте два воркспейса `stage` и `prod`.*  
+3. *В уже созданный `aws_instance` добавьте зависимость типа инстанса от вокспейса, что бы в разных ворскспейсах 
+использовались разные `instance_type`.*  
+4. *Добавим `count`. Для `stage` должен создаться один экземпляр `ec2`, а для `prod` два.*   
+5. *Создайте рядом еще один `aws_instance`, но теперь определите их количество при помощи `for_each`, а не `count`.*  
+6. *Что бы при изменении типа инстанса не возникло ситуации, когда не будет ни одного инстанса добавьте параметр
+жизненного цикла `create_before_destroy = true` в один из ресурсов `aws_instance`.*  
+7. *При желании поэкспериментируйте с другими параметрами и ресурсами.*  
+*В виде результата работы пришлите:*  
+* *Вывод команды `terraform workspace list`.*  
+* *Вывод команды `terraform plan` для воркспейса `prod`.*  
+```bash
+[user@DESKTOP-KCS3IDD terraform]$ terraform workspace new stage
+Created and switched to workspace "stage"!
+
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+```  
+```bash
+[user@DESKTOP-KCS3IDD terraform]$ terraform workspace new prod
+Created and switched to workspace "prod"!
+
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+```  
+```bash
+[user@DESKTOP-KCS3IDD terraform]$ terraform workspace list
+  default
+* prod
+  stage
+```  
+![](img/7.3_2.jpg)
+[terraform config files](https://github.com/WiktorMysz/devops-netology/tree/main/Terraform/7.3)
+```bash
+[user@DESKTOP-KCS3IDD terraform]$ terraform plan -no-color > terraform_plan.txt
+```  
+[terraform plan для `prod`](https://github.com/WiktorMysz/devops-netology/tree/main/Terraform/7.3/terraform_plan.txt)
+
+
 ###### 7.2  
 ## ДЗ 7.2 
 #### Облачные провайдеры и синтаксис Terraform.  
