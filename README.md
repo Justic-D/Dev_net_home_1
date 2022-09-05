@@ -1,4 +1,192 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 7.5  
+## ДЗ 7.5 
+#### Основы golang.
+*С `golang` в рамках курса, мы будем работать не много, поэтому можно использовать любой IDE. 
+Но рекомендуем ознакомиться с [GoLand](https://www.jetbrains.com/ru-ru/go/).*   
+
+1. *Установите golang.*  
+   1. *Воспользуйтесь инструкций с официального сайта: [https://golang.org/](https://golang.org/).*  
+   2. *Так же для тестирования кода можно использовать песочницу: [https://play.golang.org/](https://play.golang.org/).*  
+```bash
+[user@DESKTOP-KCS3IDD DevOps-netology]$ go version
+go version go1.17.12 linux/amd64
+```  
+
+2. *Знакомство с gotour.*  
+*У Golang есть обучающая интерактивная консоль [https://tour.golang.org/](https://tour.golang.org/). 
+Рекомендуется изучить максимальное количество примеров. В консоли уже написан необходимый код, 
+осталось только с ним ознакомиться и поэкспериментировать как написано в инструкции в левой части экрана.*  
+
+3. *Написание кода.*   
+*Цель этого задания закрепить знания о базовом синтаксисе языка. Можно использовать редактор кода 
+на своем компьютере, либо использовать песочницу: [https://play.golang.org/](https://play.golang.org/).*
+
+   1. *Напишите программу для перевода метров в футы (1 фут = 0.3048 метр). Можно запросить исходные данные 
+у пользователя, а можно статически задать в коде.*  
+    *Для взаимодействия с пользователем можно использовать функцию `Scanf`:*  
+   ```
+    package main
+    
+    import "fmt"
+    
+    func main() {
+        fmt.Print("Enter a number: ")
+        var input float64
+        fmt.Scanf("%f", &input)
+    
+        output := input * 2
+    
+        fmt.Println(output)    
+    }
+   ```  
+**Ответ:**  
+```bash
+package main
+
+import "fmt"
+
+func multi(m float64)(f float64) {
+    f = m * 3.281
+    return
+}
+
+func main() {
+    fmt.Print("Enter meters: ")
+    var meters float64
+    fmt.Scanf("%f", &meters)
+
+    output := multi(meters)
+    fmt.Println("Footage:", output)
+}
+```  
+```bash
+[user@DESKTOP-KCS3IDD 07-terraform-05-golang]$ go run job1.go
+Enter meters: 1
+Footage: 3.281
+```  
+ 
+2. *Напишите программу, которая найдет наименьший элемент в любом заданном списке, например:*  
+    ```
+    x := []int{48,96,86,68,57,82,63,70,37,34,83,27,19,97,9,17,}
+    ```
+```bash
+package main
+
+import "fmt"
+import "sort"
+
+func MinNum (toSort []int)(minNum int) {
+	sort.Ints(toSort)
+	minNum = toSort[0]
+	return
+}
+
+func main() {
+	x := []int{48,96,86,68,57,82,63,70,37,34,83,27,19,97,9,17,}
+	y := MinNum(x)
+	fmt.Println("Min number:", y)
+}
+```  
+```bash
+[user@DESKTOP-KCS3IDD 07-terraform-05-golang]$ go run job2.go
+Min number: 9
+```
+3. *Напишите программу, которая выводит числа от 1 до 100, которые делятся на 3. То есть `(3, 6, 9, …)`.*  
+
+```bash
+package main
+
+import (
+    "fmt"
+    "strconv"
+    "strings"
+)
+
+func NumSel ()(s []int) {
+	for i := 1;  i <= 100; i ++ {
+		if	i % 3 == 0 {
+			s = append(s, i)
+		}
+	}
+	return
+}
+
+func main() {
+	Result1 := NumSel()
+
+    // The int slice we are converting to a string.
+    values := Result1
+    valuesText := []string{}
+
+    // Create a string slice using strconv.Itoa.
+    // ... Append strings to it.
+    for i := range values {
+        number := values[i]
+        text := strconv.Itoa(number)
+        valuesText = append(valuesText, text)
+    }
+
+    // Join our string slice.
+    Result2 := strings.Join(valuesText, ", ")
+    fmt.Println("Numbers may be divided into 3: ("+Result2+")")
+}
+```  
+```bash
+[user@DESKTOP-KCS3IDD 07-terraform-05-golang]$ go run job3.go
+Numbers may be divided into 3: (3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99)
+```  
+В виде решения ссылку на код или сам код. 
+4. *Протестировать код (не обязательно).*  
+*Создайте тесты для функций из предыдущего задания.*   
+```bash
+package main
+import "testing"
+func TestMain(t *testing.T) {
+	var v float64
+	v = multi(1)
+	if v != 3.281 {
+		t.Error("Pending 3.281, received ", v)
+	}
+}
+```  
+```bash
+[user@DESKTOP-KCS3IDD 07-terraform-05-golang]$ go test job1.go job1_test.go
+ok      command-line-arguments  0.002s
+```  
+```bash
+package main
+import "testing"
+func TestMain(t *testing.T) {
+	var v int
+	v = MinNum([]int{48,96,86,68,57,82})
+	if v != 48 {
+		t.Error("Pending 48, received ", v)
+	}
+}
+```  
+```bash
+[user@DESKTOP-KCS3IDD 07-terraform-05-golang]$ go test job2.go job2_test.go
+ok      command-line-arguments  0.002s
+```  
+```bash
+package main
+import "fmt"
+import "testing"
+func TestMain(t *testing.T) {
+	var v []int
+	v = NumSel()
+	if v[5] != 18 || v[20] != 63 || v[25] != 78 {
+		s := fmt.Sprintf("Pending 18 and 64 and 78, received %v and %v and %v", v[5], v[20], v[25])
+		t.Error(s)
+	}
+}
+```
+```bash
+[user@DESKTOP-KCS3IDD 07-terraform-05-golang]$ go test job3.go job3_test.go
+ok      command-line-arguments  0.002s
+```
+
 ###### 7.3  
 ## ДЗ 7.3 
 #### Основы Terraform.  
