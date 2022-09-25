@@ -1,4 +1,573 @@
 # Репозиторий для домашних заданий по курсу DevOps
+###### 8.1  
+## ДЗ 8.1  
+#### Введение в Ansible.  
+#### Подготовка к выполнению  
+1. Установите ansible версии 2.10 или выше.  
+```bash
+[user@DESKTOP-KCS3IDD DevOps-netology]$ ansible --version
+ansible [core 2.13.4]
+```  
+2. Создайте свой собственный публичный репозиторий на github с произвольным именем.
+```bash
+https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-01-base
+```  
+3. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
+
+#### Основная часть
+1. Попробуйте запустить playbook на окружении из `test.yml`, зафиксируйте какое значение имеет факт `some_fact` для указанного хоста при выполнении playbook'a.  
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ ansible-playbook -i ../playbook/inventory/test.yml ../playbook/site.yml
+
+
+PLAY [Print os facts] ******************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************************************************************************************************************************
+[WARNING]: Platform linux on host localhost is using the discovered Python interpreter at /usr/bin/python3.9, but future installation of another Python interpreter could change the meaning of that path. See
+https://docs.ansible.com/ansible-core/2.13/reference_appendices/interpreter_discovery.html for more information.
+ok: [localhost]
+
+TASK [Print OS] ************************************************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "OracleLinux"
+}
+
+TASK [Print fact] **********************************************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": 12
+}
+
+PLAY RECAP *****************************************************************************************************************************************************************************************************************************
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0    rescued=0    ignored=0
+```
+2. Найдите файл с переменными (group_vars) в котором задаётся найденное в первом пункте значение и поменяйте его на 'all default fact'.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ cat ../playbook/group_vars/all/examp.yml
+---
+  some_fact: all default fact
+```  
+3. Воспользуйтесь подготовленным (используется `docker`) или создайте собственное окружение для проведения дальнейших испытаний.
+
+`docker-compose.yml`
+```bash
+version: '3'
+services:
+  centos7:
+    image: pycontribs/centos:7
+    container_name: centos7
+    restart: unless-stopped
+    entrypoint: "sleep infinity"
+
+  ubuntu:
+    image: pycontribs/ubuntu
+    container_name: ubuntu
+    restart: unless-stopped
+    entrypoint: "sleep infinity"
+```
+4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant provision
+==> server2.netology: Running provisioner: docker...
+==> server2.netology: Running provisioner: docker_compose...
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: ubuntu is up-to-date
+==> server2.netology: centos7 is up-to-date
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Running ansible-playbook...
+[WARNING]: Ansible is being run in a world writable directory (/vagrant),
+ignoring it as an ansible.cfg source. For more information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] **************************************************************
+ok: [centos7] => {
+    "msg": "el"
+}
+ok: [ubuntu] => {
+    "msg": "deb"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+```
+5. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились следующие значения: для `deb` - 'deb default fact', для `el` - 'el default fact'.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ cat ../playbook/group_vars/deb/examp.yml
+---
+  some_fact: "deb default fact"
+```  
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ cat ../playbook/group_vars/el/examp.yml
+---
+  some_fact: "el default fact"
+```  
+6. Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant provision
+==> server2.netology: Running provisioner: docker...
+==> server2.netology: Running provisioner: docker_compose...
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: centos7 is up-to-date
+==> server2.netology: ubuntu is up-to-date
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Running ansible-playbook...
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] **************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ ansible-vault encrypt ../playbook/group_vars/deb/examp.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+[user@DESKTOP-KCS3IDD vagrant]$ ansible-vault encrypt ../playbook/group_vars/el/examp.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+```  
+8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant provision
+==> server2.netology: Running provisioner: docker...
+==> server2.netology: Running provisioner: docker_compose...
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: centos7 is up-to-date
+==> server2.netology: ubuntu is up-to-date
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Running ansible-playbook...
+
+PLAY [Print os facts] **********************************************************
+ERROR! Decryption failed (no vault secrets were found that could decrypt) on /vagrant/group_vars/el/examp.yml
+Ansible failed to complete successfully. Any error output should be
+visible above. Please fix these errors and try again.
+```  
+```bash
+Добавил в Vagrantfile: ansible.vault_password_file = "/vagrant/ansible_vault_key"
+```  
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant provision
+==> server2.netology: Running provisioner: docker...
+==> server2.netology: Running provisioner: docker_compose...
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: ubuntu is up-to-date
+==> server2.netology: centos7 is up-to-date
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Running ansible-playbook...
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] **************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```  
+9. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
+```bash
+"local.py" - This connection plugin allows ansible to execute tasks on the Ansible 'controller' instead of on a remote host.
+```
+10. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ cat ../playbook/inventory/prod.yml ; echo ""
+---
+  el:
+    hosts:
+      centos7:
+        ansible_connection: docker
+  deb:
+    hosts:
+      ubuntu:
+        ansible_connection: docker
+  local:
+    hosts:
+      localhost:
+        ansible_connection: local
+```  
+11. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant provision
+==> server2.netology: Running provisioner: docker...
+==> server2.netology: Running provisioner: docker_compose...
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: centos7 is up-to-date
+==> server2.netology: ubuntu is up-to-date
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Running ansible-playbook...
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] **************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [localhost] => {
+    "msg": "all default fact"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+```bash
+создал отдельный group-vars для local -> получил для local из local
+```
+```bash
+$ ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
+Vault password: 
+PLAY [Print os facts] ********************************************************************************************************************************************************************************************************
+TASK [Gathering Facts] *******************************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [centos7]
+TASK [Print OS] **************************************************************************************************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+TASK [Print fact] ************************************************************************************************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [localhost] => {
+    "msg": "local default fact"
+}
+PLAY RECAP *******************************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+12. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
+
+#### Необязательная часть
+
+1. При помощи `ansible-vault` расшифруйте все зашифрованные файлы с переменными.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ ansible-vault decrypt --ask-vault-password ../playbook/group_vars/deb/* ../playbook/group_vars/el/*
+Vault password: 
+Decryption successful
+```
+2. Зашифруйте отдельное значение `PaSSw0rd` для переменной `some_fact` паролем `netology`. Добавьте полученное значение в `group_vars/all/exmp.yml`.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ ansible-vault encrypt_string "PaSSw0rd"
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+!vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31323233626638313433653866663932336530636363626137386631633534396532353139326433
+          6434623361623437323966633932666633303537646263350a353665653030306534306631633734
+          62373334363539323633323338643862376235306562623230666638326438623561643438656665
+          3765666334623434380a376637333863616634353331656636373337396664316634343434393264
+          3639
+```  
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ cat ../playbook/group_vars/all/examp.yml
+---
+  some_fact: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31323233626638313433653866663932336530636363626137386631633534396532353139326433
+          6434623361623437323966633932666633303537646263350a353665653030306534306631633734
+          62373334363539323633323338643862376235306562623230666638326438623561643438656665
+          3765666334623434380a376637333863616634353331656636373337396664316634343434393264
+          3639
+         
+```
+3. Запустите `playbook`, убедитесь, что для нужных хостов применился новый `fact`.
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant provision
+==> server2.netology: Running provisioner: docker...
+==> server2.netology: Running provisioner: docker_compose...
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: centos7 is up-to-date
+==> server2.netology: ubuntu is up-to-date
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Running ansible-playbook...
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] **************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [localhost] => {
+    "msg": "PaSSw0rd"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+```
+4. Добавьте новую группу хостов `fedora`, самостоятельно придумайте для неё переменную. В качестве образа можно использовать [этот](https://hub.docker.com/r/pycontribs/fedora).
+```bash
+[user@DESKTOP-KCS3IDD vagrant]$ vagrant up
+Bringing machine 'server2.netology' up with 'virtualbox' provider...
+==> server2.netology: Importing base box 'bento/ubuntu-20.04'...
+==> server2.netology: Matching MAC address for NAT networking...
+==> server2.netology: Checking if box 'bento/ubuntu-20.04' version '202206.03.0' is up to date...
+==> server2.netology: Setting the name of the VM: server2.netology
+==> server2.netology: Clearing any previously set network interfaces...
+==> server2.netology: Preparing network interfaces based on configuration...
+    server2.netology: Adapter 1: nat
+    server2.netology: Adapter 2: hostonly
+==> server2.netology: Forwarding ports...
+    server2.netology: 22 (guest) => 20011 (host) (adapter 1)
+    server2.netology: 22 (guest) => 2222 (host) (adapter 1)
+    server2.netology: 22 (guest) => 2222 (host) (adapter 1)
+==> server2.netology: Running 'pre-boot' VM customizations...
+==> server2.netology: Booting VM...
+==> server2.netology: Waiting for machine to boot. This may take a few minutes...
+    server2.netology: SSH address: 172.20.112.1:2222
+    server2.netology: SSH username: vagrant
+    server2.netology: SSH auth method: password
+    server2.netology: Warning: Connection reset. Retrying...
+==> server2.netology: Machine booted and ready!
+==> server2.netology: Checking for guest additions in VM...
+==> server2.netology: Setting hostname...
+==> server2.netology: Configuring and enabling network interfaces...
+==> server2.netology: Mounting shared folders...
+    server2.netology: /stack => /mnt/d/YandexDisk/DevOps-netology/08-ansible-01-base/src/stack
+    server2.netology: /vagrant => /mnt/d/YandexDisk/DevOps-netology/08-ansible-01-base/src/playbook
+==> server2.netology: Detected mount owner ID within mount options. (uid: 1000 guestpath: /vagrant)
+==> server2.netology: Detected mount group ID within mount options. (gid: 1000 guestpath: /vagrant)
+==> server2.netology: Running provisioner: docker...
+    server2.netology: Installing Docker onto machine...
+==> server2.netology: Running provisioner: docker_compose...                                                                                                  
+    server2.netology: Checking for Docker Compose installation...
+    server2.netology: Getting machine and kernel name from guest machine...
+    server2.netology: Downloading Docker Compose 1.24.1 for Linux x86_64
+    server2.netology: Downloaded Docker Compose 1.24.1 has SHA256 signature cfb3439956216b1248308141f7193776fcf4b9c9b49cbbe2fb07885678e2bb8a
+    server2.netology: Uploading Docker Compose 1.24.1 to guest machine...
+    server2.netology: Installing Docker Compose 1.24.1 in guest machine...
+    server2.netology: Symlinking Docker Compose 1.24.1 in guest machine...
+    server2.netology: Running docker-compose rm...
+    server2.netology: No stopped containers
+    server2.netology: Running docker-compose build...
+==> server2.netology: centos7 uses an image, skipping
+==> server2.netology: ubuntu uses an image, skipping
+==> server2.netology: fedora uses an image, skipping
+    server2.netology: Running docker-compose up...
+==> server2.netology: Creating network "stack_default" with the default driver
+==> server2.netology: Pulling centos7 (pycontribs/centos:7)...
+    server2.netology: 7: Pulling from pycontribs/centos
+    server2.netology: Digest: sha256:b3ce994016fd728998f8ebca21eb89bf4e88dbc01ec2603c04cc9c56ca964c69
+    server2.netology: Status: Downloaded newer image for pycontribs/centos:7
+==> server2.netology: Pulling ubuntu (pycontribs/ubuntu:)...
+    server2.netology: latest: Pulling from pycontribs/ubuntu
+    server2.netology: Digest: sha256:dcb590e80d10d1b55bd3d00aadf32de8c413531d5cc4d72d0849d43f45cb7ec4
+    server2.netology: Status: Downloaded newer image for pycontribs/ubuntu:latest
+==> server2.netology: Pulling fedora (pycontribs/fedora:)...
+    server2.netology: latest: Pulling from pycontribs/fedora
+    server2.netology: Digest: sha256:20eeb45ef6e394947058dc24dc2bd98dfb7a8fecbbe6363d14ab3170f10a27ab
+    server2.netology: Status: Downloaded newer image for pycontribs/fedora:latest
+==> server2.netology: Creating fedora ... 
+==> server2.netology: Creating ubuntu ... 
+==> server2.netology: Creating centos7 ... 
+Creating fedora  ... done
+Creating centos7 ... done
+Creating ubuntu  ... done
+==> server2.netology: Running provisioner: ansible_local...
+    server2.netology: Installing Ansible...
+    server2.netology: Installing pip... (for Ansible installation)
+    server2.netology: Running ansible-playbook...
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [fedora]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [fedora] => {
+    "msg": "Fedora"
+}
+
+TASK [Print fact] **************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [localhost] => {
+    "msg": "PaSSw0rd"
+}
+ok: [fedora] => {
+    "msg": "fed default fact"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+fedora                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+5. Напишите скрипт на bash: автоматизируйте поднятие необходимых контейнеров, запуск ansible-playbook и остановку контейнеров.
+```bash
+Реализовал этот функционал на Vagrant, см. выше.
+```
+6. Все изменения должны быть зафиксированы и отправлены в вашей личный репозиторий.
+
+
+
 ###### 7.6  
 ## ДЗ 7.6 
 #### Написание собственных провайдеров для Terraform.
