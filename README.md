@@ -9,9 +9,7 @@
 ansible [core 2.13.4]
 ```  
 2. Создайте свой собственный публичный репозиторий на github с произвольным именем.
-```bash
-https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-01-base
-```  
+[https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-01-base/src](https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-01-base/src)  
 3. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
 
 #### Основная часть
