@@ -15,7 +15,7 @@ servers = [
 ]
 
 Vagrant.configure(2) do |config|
-  config.vm.synced_folder ".", "/08-ansible-01-base/src/vagrant", disabled: true
+  config.vm.synced_folder ".", "/08-ansible-02-playbook/src/vagrant", disabled: true
   config.vm.synced_folder "../stack", "/stack"
   config.vm.synced_folder "../playbook", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=664"]
   config.ssh.username = 'vagrant'
@@ -25,7 +25,6 @@ Vagrant.configure(2) do |config|
   config.vm.provision :docker_compose, yml: "/stack/docker-compose.yml", rebuild: true, run: "always"
   config.vm.provision "ansible_local", run: "always" do |ansible|
     ansible.limit = "all"
-    ansible.vault_password_file = "/vagrant/ansible_vault_key"
     ansible.inventory_path = "inventory/prod.yml"
     ansible.playbook = "/vagrant/site.yml"
     ansible.playbook_command = "sudo ansible-playbook"

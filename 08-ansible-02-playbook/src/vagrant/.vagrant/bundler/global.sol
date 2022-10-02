@@ -1,1 +1,1 @@
-{"dependencies":[["vagrant-docker-compose",["= 1.5.1"]],["rake",[">= 0"]],["virtualbox_WSL2",["= 0.1.3"]]],"checksum":"b62a8864add9e0f1cb0b077fccde2ac0a3e649a8b9dfd04df404493e6939bf97","vagrant_version":"2.3.0"}
+{"dependencies":[["vagrant-docker-compose",["= 1.5.1"]],["rake",[">= 0"]],["virtualbox_WSL2",["= 0.1.3"]]],"checksum":"b62a8864add9e0f1cb0b077fccde2ac0a3e649a8b9dfd04df404493e6939bf97","vagrant_version":"2.3.1"}

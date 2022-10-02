@@ -1,19 +1,13 @@
 version: '3'
 services:
-  centos7:
-    image: pycontribs/centos:7
-    container_name: centos7
-    restart: unless-stopped
-    entrypoint: "sleep infinity"
-
-  ubuntu:
+  elastic:
     image: pycontribs/ubuntu
-    container_name: ubuntu
+    container_name: elastic
     restart: unless-stopped
     entrypoint: "sleep infinity"
 
-  fedora:
-    image: pycontribs/fedora
-    container_name: fedora
+  kibana:
+    image: pycontribs/ubuntu
+    container_name: kibana
     restart: unless-stopped
     entrypoint: "sleep infinity"
