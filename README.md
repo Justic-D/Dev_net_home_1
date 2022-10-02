@@ -104,7 +104,7 @@ OS name: "linux", version: "5.10.102.1-microsoft-standard-wsl2", arch: "amd64", 
 
 #### Подготовка к выполнению
 1. *Создайте свой собственный (или используйте старый) публичный репозиторий на github с произвольным именем.*  
-[https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-01-playbook/src](https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-01-playbook/src)
+[https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-02-playbook/src](https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-02-playbook/src)
 2. *Скачайте [playbook](https://github.com/netology-code/mnt-homeworks/blob/master/08-ansible-02-playbook/playbook) из репозитория с домашним заданием и перенесите его в свой репозиторий.*  
 3. *Подготовьте хосты в соотвтествии с группами из предподготовленного playbook.*  
 ```bash
@@ -418,8 +418,8 @@ elastic                    : ok=11   changed=8    unreachable=0    failed=0    s
 kibana                     : ok=11   changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 logstash                   : ok=11   changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
-[README.md](https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-02-playbook/README.md) 
-[playbook](https://github.com/WiktorMysz/devops-netology/tree/main/src/08-ansible-02-playbook/playbook)
+[README.md](https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-02-playbook/README.md)  
+[playbook](https://github.com/WiktorMysz/devops-netology/tree/main/08-ansible-02-playbook/src)  
 
 ###### 8.1  
 ## ДЗ 8.1  
