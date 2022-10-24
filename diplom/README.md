@@ -18,31 +18,31 @@
   
 #### 2. Создание инфраструктуры.  
 Terraform сконфигурирован и создание инфраструктуры посредством Terraform возможно без дополнительных ручных действий. 
-![](/img/04.jpg)  
-![](/img/05.jpg)  
+![](img/04.jpg)  
+![](img/05.jpg)  
 
 #### 3. Установка Nginx и LetsEncrypt  
 Настроены все upstream для URL. В браузере можно открыть любой из этих URL и увидеть ответ сервера (502 Bad Gateway).  
-![](/img/06.jpg)  
-![](/img/02.jpg)  
-![](/img/12.jpg)  
+![](img/06.jpg)  
+![](img/02.jpg)  
+![](img/12.jpg)  
 
 #### 4. Установка кластера MySQL  
 Имена серверов: db01.myshelov.site и db02.myshelov.site  
 
 #### 5. Установка WordPress
 В браузере можно открыть URL https://www.myshelov.site  и увидеть главную страницу WordPress.  
-![](/img/03.jpg)  
+![](img/03.jpg)  
 
 #### 6. Установка Gitlab CE и Gitlab Runner
 Интерфейс Gitlab доступен по https.
-![](diplom/img/08.jpg)  
+![](img/08.jpg)  
 
 #### 7. Установка Prometheus, Alert Manager, Node Exporter и Grafana  
 Получение метрик со всей инфраструктуры.
-![](/img/09.jpg)  
-![](/img/10.jpg)  
-![](/img/11.jpg)  
+![](img/09.jpg)  
+![](img/10.jpg)  
+![](img/11.jpg)  
 
 #### Что необходимо для сдачи задания
 
