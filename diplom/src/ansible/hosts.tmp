@@ -1,0 +1,41 @@
+[node01]
+myshelov.site
+[node01:vars]
+ansible_host=$node01_proxy_public
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[node02]
+db01.myshelov.site mysql_server_id=1 mysql_replication_role=master
+[node02:vars]
+ansible_host=$node02_db01_private
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -W %h:%p -q user@myshelov.site -o StrictHostKeyChecking=no"'
+
+[node03]
+db02.myshelov.site mysql_server_id=2 mysql_replication_role=slave
+[node03:vars]
+ansible_host=$node03_db02_private
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -W %h:%p -q user@myshelov.site -o StrictHostKeyChecking=no"'
+
+[node04]
+app.myshelov.site
+[node04:vars]
+ansible_host=$node04_app_private
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -W %h:%p -q user@myshelov.site -o StrictHostKeyChecking=no"'
+
+[node05]
+gitlab.myshelov.site
+[node05:vars]
+ansible_host=$node05_gitlab_private
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -W %h:%p -q user@myshelov.site -o StrictHostKeyChecking=no"'
+
+[node06]
+runner.myshelov.site
+[node06:vars]
+ansible_host=$node06_runner_private
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -W %h:%p -q user@myshelov.site -o StrictHostKeyChecking=no"'
+
+[node07]
+monitoring.myshelov.site
+[node07:vars]
+ansible_host=$node07_monitoring_private
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -W %h:%p -q user@myshelov.site -o StrictHostKeyChecking=no"'

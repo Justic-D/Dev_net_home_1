@@ -1,0 +1,59 @@
+---
+#- hosts: node01
+#  become: true
+#  become_user: root
+#  become_method: sudo
+#  tasks:
+#    - name: Copy files.
+#      copy:
+#        src: '/home/user/.ssh/id_ed25519'
+#        dest: '/home/user/.ssh/id_ed25519'
+#  roles:
+#    - proxy_server
+#    - node_exporter
+#
+#- hosts: node02 node03
+#  become: true
+#  become_user: root
+#  become_method: sudo
+#  roles:
+#    - mysql
+#    - node_exporter
+#    - mysqld_exporter
+#
+#- hosts: node04
+#  become: true
+#  become_user: root
+#  become_method: sudo
+#  roles:
+#    - wordpress
+#    - node_exporter
+
+- hosts: node05
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - gitlab
+    - node_exporter
+  environment:
+    GITLAB_ROOT_PASSWORD: "{{ gitlab_initial_root_password }}"
+    GITLAB_SHARED_RUNNERS_REGISTRATION_TOKEN: "{{ gitlab_runners_registration_token }}"
+
+- hosts: node06
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - runner
+    - node_exporter
+
+- hosts: node07
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus
+    - alertmanager
+    - grafana
+    - node_exporter

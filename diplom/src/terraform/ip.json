@@ -1,0 +1,42 @@
+{
+  "node01_proxy_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.1.10"
+  },
+  "node01_proxy_public": {
+    "sensitive": false,
+    "type": "string",
+    "value": "51.250.69.51"
+  },
+  "node02_db01_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.2.4"
+  },
+  "node03_db02_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.3.11"
+  },
+  "node04_app_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.1.28"
+  },
+  "node05_gitlab_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.2.15"
+  },
+  "node06_runner_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.3.17"
+  },
+  "node07_monitoring_private": {
+    "sensitive": false,
+    "type": "string",
+    "value": "192.168.1.13"
+  }
+}
